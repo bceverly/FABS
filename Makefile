@@ -1,4 +1,4 @@
-libfsqlite.a:	csqlite.o fsqlite.o
+/libfsqlite.a:	csqlite.o fsqlite.o
 	ar r libfsqlite.a fsqlite.o csqlite.o
 
 csqlite.o:	csqlite.c
