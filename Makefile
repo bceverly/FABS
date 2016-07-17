@@ -7,7 +7,10 @@ csqlite.o:	csqlite.c
 fsqlite.o:	fsqlite.f90
 	egfortran -c fsqlite.f90
 
-.PHONY: clean
+.PHONY: clean deploy
 
 clean:
 	rm *.o *.mod libfsqlite.a
+
+deploy:
+	doas /bin/sh deploy.sh
