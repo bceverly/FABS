@@ -1,4 +1,7 @@
-/libfsqlite.a:	csqlite.o fsqlite.o
+cgi/api.cgi:	libfsqlite.a api.f90
+	egfortran -o cgi/api.cgi api.f90 -L/usr/lib -lsqlite3 -L. -lfsqlite
+
+libfsqlite.a:	csqlite.o fsqlite.o
 	ar r libfsqlite.a fsqlite.o csqlite.o
 
 csqlite.o:	csqlite.c
@@ -10,7 +13,7 @@ fsqlite.o:	fsqlite.f90
 .PHONY: clean deploy
 
 clean:
-	rm *.o *.mod libfsqlite.a
+	rm *.o *.mod libfsqlite.a cgi/api.cgi
 
 deploy:
 	doas /bin/sh deploy.sh

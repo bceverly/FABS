@@ -1,4 +1,4 @@
-!#/bin/sh
+#!/bin/sh
 
 if [ "`id -u`" -ne 0 ]; then
     echo "Please run as root"
@@ -12,4 +12,4 @@ rm -rf ${SITEDIR}/*
 rm -rf ${CGIDIR}/*
 
 cp -r site/* ${SITEDIR}
-cp -r cgi/* ${CGIDIR}
+cp -r cgi/*.cgi ${CGIDIR}
