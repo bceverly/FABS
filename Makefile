@@ -13,7 +13,12 @@ fsqlite.o:	fsqlite.f90
 .PHONY: clean deploy
 
 clean:
-	rm *.o *.mod libfsqlite.a cgi/api.cgi
+	rm *.o *.mod libfsqlite.a cgi/api.cgi test.db
+
+schema:
+	- rm file.db.bak 
+	- mv file.db file.db.bak 
+	sqlite3 -init schema.sql file.db ""
 
 deploy:
 	doas /bin/sh deploy.sh

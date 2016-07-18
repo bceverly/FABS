@@ -4,7 +4,7 @@ program api
     call get_environment_variable("PATH_INFO", path_info)
     call get_environment_variable("REQUEST_METHOD", request_method)
 
-    print '(a)', 'Content-type: application/json'
+    print '(a)', 'Content-Type: application/json'
     print '(a)', 'Status: 200'
     print '(a)', ''
     print '(a)', '{'
