@@ -4,10 +4,10 @@ module api_errors
     implicit none
     private
 
-    public :: open_database_error
+    public :: database_error
 
 contains
-    subroutine open_database_error(db)
+    subroutine database_error(db)
         type(SQLITE_DATABASE), intent(inout) :: db
 
         character(len=80) :: error_msg
@@ -20,9 +20,8 @@ contains
         print '(a)', '  "status": "', error_msg, '",'
         print '(a)', '  "count": 0,'
         print '(a)', '  "type": "error",'
-        print '(a)', '  "results": [ {'
-        print '(a)', '  }]'
+        print '(a)', '  "results": [ ]'
         print '(a)', '}'
-    end subroutine open_database_error
+    end subroutine database_error
 
 end module api_errors

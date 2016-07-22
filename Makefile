@@ -1,8 +1,12 @@
-cgi/api.cgi:	libfsqlite.a api_errors.o api.f90
-	egfortran -o cgi/api.cgi api.f90 api_errors.o -L/usr/lib -lsqlite3 -L. -lfsqlite
+cgi/api.cgi:	libfsqlite.a student_m.o api_errors.o api.f90
+	egfortran -o cgi/api.cgi api.f90 student_m.o api_errors.o \
+	    -L/usr/lib -lsqlite3 -L. -lfsqlite
 
 api_errors.o:	api_errors.f90
 	egfortran -c api_errors.f90
+
+student_m.o:	student_m.f90
+	egfortran -c student_m.f90
 
 libfsqlite.a:	csqlite.o fsqlite.o
 	ar r libfsqlite.a fsqlite.o csqlite.o
