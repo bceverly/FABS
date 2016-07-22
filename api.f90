@@ -13,7 +13,7 @@ program api
     character(len=80) :: first_name
     character(len=80) :: last_name
     integer :: id, num_rows
-    type(student_t), pointer :: the_student
+    type(student_t) :: the_student
     type(http_response_t) :: response
     character(len=80) :: object_name = "student"
 
@@ -41,13 +41,8 @@ program api
     if (.NOT. finished) call sqlite3_get_column(column(1), num_rows)
     if (sqlite3_error(db)) call database_error(db)
 
-    deallocate(column)
-    allocate (column(3))
-    call sqlite3_column_query (column(1), 'first_name', SQLITE_CHAR)
-    call sqlite3_column_query (column(2), 'last_name', SQLITE_CHAR)
-    call sqlite3_column_query (column(3), 'id', SQLITE_INT)
-
-    call sqlite3_prepare_select (db, 'student', column, stmt, '')
+    call sqlite3_prepare_select (db, 'student', &
+                                 the_student%get_sqlite_columns(), stmt, '')
     if (sqlite3_error(db)) call database_error(db)
 
     call response%write_success_header(num_rows, object_name)
@@ -62,13 +57,10 @@ program api
         call sqlite3_get_column(column(2), last_name)
         call sqlite3_get_column(column(3), id)
 
-        if (associated(the_student)) deallocate(the_student)
-        allocate(the_student)
         call the_student%initialize(first_name, last_name, id)
         call the_student%write_json(1)
         print '(a)', ','
     enddo
-    if (associated(the_student)) deallocate(the_student)
 
     print '(a)', '  ]'
     call response%write_success_footer()
