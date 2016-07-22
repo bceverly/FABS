@@ -2,6 +2,7 @@ program api
     use sqlite
     use api_errors
     use student_m
+    use http_response_m
     implicit none
 
     type(SQLITE_DATABASE) :: db
@@ -13,6 +14,8 @@ program api
     character(len=80) :: last_name
     integer :: id, num_rows
     type(student_t), pointer :: the_student
+    type(http_response_t) :: response
+    character(len=80) :: object_name = "student"
 
     character(len=4096) :: path_info, request_method
 
@@ -47,14 +50,15 @@ program api
     call sqlite3_prepare_select (db, 'student', column, stmt, '')
     if (sqlite3_error(db)) print *, sqlite3_error(db)
 
-    print '(a)', 'Content-Type: application/json'
-    print '(a)', 'Status: 200'
-    print '(a)', ''
-    print '(a)', '{'
-    print '(a)', '  "status": "success",'
-    print '(a, i5, a)', '  "count": ', num_rows, ','
-    print '(a)', '  "type": "student",'
-    print '(a)', '  "results": ['
+    call response%write_success_header(num_rows, object_name)
+!    print '(a)', 'Content-Type: application/json'
+!    print '(a)', 'Status: 200'
+!    print '(a)', ''
+!    print '(a)', '{'
+!    print '(a)', '  "status": "success",'
+!    print '(a, i5, a)', '  "count": ', num_rows, ','
+!    print '(a)', '  "type": "student",'
+!    print '(a)', '  "results": ['
 
     do
         call sqlite3_next_row (stmt, column, finished)
@@ -75,7 +79,7 @@ program api
     if (associated(the_student)) deallocate(the_student)
 
     print '(a)', '  ]'
-    print '(a)', '}'
+    call response%write_success_footer()
 
     call sqlite3_close (db)
 end program api
