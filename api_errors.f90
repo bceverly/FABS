@@ -1,5 +1,6 @@
 module api_errors
     use sqlite
+    use http_response_m
 
     implicit none
     private
@@ -9,19 +10,12 @@ module api_errors
 contains
     subroutine database_error(db)
         type(SQLITE_DATABASE), intent(inout) :: db
+        type(http_response_t) :: response
 
         character(len=80) :: error_msg
         error_msg = sqlite3_errmsg(db)
 
-        print '(a)', 'Content-Type: application/json'
-        print '(a)', 'Status: 500'
-        print '(a)', ''
-        print '(a)', '{'
-        print '(a)', '  "status": "', error_msg, '",'
-        print '(a)', '  "count": 0,'
-        print '(a)', '  "type": "error",'
-        print '(a)', '  "results": [ ]'
-        print '(a)', '}'
+        call response%write_error(error_msg)
     end subroutine database_error
 
 end module api_errors
