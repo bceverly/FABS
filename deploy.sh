@@ -13,4 +13,4 @@ rm -rf ${CGIDIR}/*
 
 cp -r site/* ${SITEDIR}
 cp -r cgi/*.cgi ${CGIDIR}
-cp test.db ${CGIDIR}
+cp students.db ${CGIDIR}

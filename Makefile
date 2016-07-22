@@ -1,5 +1,8 @@
-cgi/api.cgi:	libfsqlite.a api.f90
-	egfortran -o cgi/api.cgi api.f90 -L/usr/lib -lsqlite3 -L. -lfsqlite
+cgi/api.cgi:	libfsqlite.a api_errors.o api.f90
+	egfortran -o cgi/api.cgi api.f90 api_errors.o -L/usr/lib -lsqlite3 -L. -lfsqlite
+
+api_errors.o:	api_errors.f90
+	egfortran -c api_errors.f90
 
 libfsqlite.a:	csqlite.o fsqlite.o
 	ar r libfsqlite.a fsqlite.o csqlite.o
@@ -13,12 +16,12 @@ fsqlite.o:	fsqlite.f90
 .PHONY: clean deploy
 
 clean:
-	rm *.o *.mod libfsqlite.a cgi/api.cgi test.db
+	rm *.o *.mod libfsqlite.a cgi/api.cgi *.db
 
 schema:
-	- rm file.db.bak 
-	- mv file.db file.db.bak 
-	sqlite3 -init schema.sql file.db ""
+	- rm students.db.bak 
+	- mv students.db students.db.bak 
+	sqlite3 -init schema.sql students.db ""
 
 deploy:
 	doas /bin/sh deploy.sh
