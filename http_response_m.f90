@@ -1,4 +1,7 @@
 module http_response_m
+    use http_content_types
+    use http_response_codes
+
     implicit none
     private
 

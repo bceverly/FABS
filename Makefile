@@ -1,15 +1,25 @@
+FORTRAN = egfortran
+FCFLAGS = -c
+
 cgi/api.cgi:	libfsqlite.a student_m.o api_errors.o http_response_m.o api.f90
-	egfortran -o cgi/api.cgi api.f90 student_m.o api_errors.o \
+	${FORTRAN} -o cgi/api.cgi api.f90 student_m.o api_errors.o \
 	    http_response_m.o -L/usr/lib -lsqlite3 -L. -lfsqlite
 
-api_errors.o:	api_errors.f90
-	egfortran -c api_errors.f90
+api_errors.o:	api_errors.f90 http_response_m.o
+	${FORTRAN} ${FCFLAGS} api_errors.f90
 
 student_m.o:	student_m.f90
-	egfortran -c student_m.f90
+	${FORTRAN} ${FCFLAGS} student_m.f90
 
-http_response_m.o:	http_response_m.f90
-	egfortran -c http_response_m.f90
+http_response_m.o:	http_response_m.f90 http_response_codes.o \
+			http_content_types.o
+	${FORTRAN} ${FCFLAGS} http_response_m.f90
+
+http_response_codes.o:	http_response_codes.f90
+	${FORTRAN} ${FCFLAGS} http_response_codes.f90
+
+http_content_types.o:	http_content_types.f90
+	${FORTRAN} ${FCFLAGS} http_content_types.f90
 
 libfsqlite.a:	csqlite.o fsqlite.o
 	ar r libfsqlite.a fsqlite.o csqlite.o
@@ -18,12 +28,12 @@ csqlite.o:	csqlite.c
 	gcc -c -DLOWERCASE -I/usr/local/include csqlite.c
 
 fsqlite.o:	fsqlite.f90
-	egfortran -c fsqlite.f90
+	${FORTRAN} ${FCFLAGS} fsqlite.f90
 
 .PHONY: clean deploy
 
 clean:
-	rm *.o *.mod libfsqlite.a cgi/api.cgi *.db
+	rm *.o *.mod libfsqlite.a cgi/api.cgi
 
 schema:
 	- rm students.db.bak 

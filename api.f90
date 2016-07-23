@@ -41,8 +41,14 @@ program api
     if (.NOT. finished) call sqlite3_get_column(column(1), num_rows)
     if (sqlite3_error(db)) call database_error(db)
 
+    deallocate(column)
+    allocate(column(3))
+    call sqlite3_column_query(column(1), 'first_name', SQLITE_CHAR)
+    call sqlite3_column_query(column(2), 'last_name', SQLITE_CHAR)
+    call sqlite3_column_query(column(3), 'id', SQLITE_INT)
+
     call sqlite3_prepare_select (db, 'student', &
-                                 the_student%get_sqlite_columns(), stmt, '')
+                                 column, stmt, '')
     if (sqlite3_error(db)) call database_error(db)
 
     call response%write_success_header(num_rows, object_name)
