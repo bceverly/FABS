@@ -1,6 +1,6 @@
 module student_collection_m
     use student_m
-    use sqlite_store_m
+    use persistent_collection_m
     use sqlite
 
     implicit none
@@ -36,11 +36,11 @@ contains
         character(len=80) :: last_name
         integer :: id, num_rows, i
         type(student_t) :: the_student
-        type(sqlite_store_t) :: store
+        type(persistent_collection_t) :: store
         character(len=80) :: db_name = 'students.db'
         character(len=80) :: table_name = 'student'
 
-        store = sqlite_store_t(db_name)
+        store = persistent_collection_t(db_name)
         num_rows = store%get_row_count(table_name)
         
         if (associated(this%students_m)) deallocate(this%students_m)

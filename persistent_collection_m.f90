@@ -1,10 +1,10 @@
-module sqlite_store_m
+module persistent_collection_m
     use sqlite
 
     implicit none
     private
 
-    type, public :: sqlite_store_t
+    type, public :: persistent_collection_t
         private
             type(SQLITE_DATABASE) :: db
 
@@ -12,27 +12,27 @@ module sqlite_store_m
         final :: destructor
         procedure, public, pass(this) :: get_row_count
 
-    end type sqlite_store_t
+    end type persistent_collection_t
 
-    interface sqlite_store_t
-        module procedure sqlite_store_t_constructor
-    end interface sqlite_store_t
+    interface persistent_collection_t
+        module procedure persistent_collection_t_constructor
+    end interface persistent_collection_t
 contains
-    type (sqlite_store_t) function sqlite_store_t_constructor(dbname)
+    type (persistent_collection_t) function persistent_collection_t_constructor(dbname)
         character(len=80), intent(inout) :: dbname
 
-        call sqlite3_open(dbname, sqlite_store_t_constructor%db)
+        call sqlite3_open(dbname, persistent_collection_t_constructor%db)
 
-    end function sqlite_store_t_constructor
+    end function persistent_collection_t_constructor
 
     subroutine destructor(this)
-        type(sqlite_store_t) :: this
+        type(persistent_collection_t) :: this
 
         call sqlite3_close(this%db)
     end subroutine destructor
 
     integer function get_row_count(this, table)
-        class(sqlite_store_t) :: this
+        class(persistent_collection_t) :: this
         character(len=80) :: table
 
         type(SQLITE_COLUMN), dimension(:), pointer :: column
@@ -53,4 +53,4 @@ contains
 
         deallocate(column)
     end function get_row_count
-end module sqlite_store_m
+end module persistent_collection_m

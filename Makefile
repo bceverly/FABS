@@ -3,20 +3,21 @@ FCFLAGS = -c
 
 cgi/api.cgi:	libfsqlite.a student_m.o api_errors.o http_response_m.o \
 	        http_response_codes.o student_collection_m.o \
-		sqlite_store_m.o http_content_types.o api.f90
+		persistent_collection_m.o http_content_types.o api.f90
 	${FORTRAN} -o cgi/api.cgi api.f90 student_m.o api_errors.o \
 	    student_collection_m.o http_response_codes.o http_content_types.o \
-	    sqlite_store_m.o \
+	    persistent_collection_m.o \
 	    http_response_m.o -L/usr/lib -lsqlite3 -L. -lfsqlite
 
 api_errors.o:	api_errors.f90 http_response_m.o
 	${FORTRAN} ${FCFLAGS} api_errors.f90
 
-student_collection_m.o:	student_m.o sqlite_store_m.o student_collection_m.f90
+student_collection_m.o:	student_m.o persistent_collection_m.o \
+			student_collection_m.f90
 	$(FORTRAN) $(FCFLAGS) student_collection_m.f90
 
-sqlite_store_m.o:	sqlite_store_m.f90
-	$(FORTRAN) $(FCFLAGS) sqlite_store_m.f90
+persistent_collection_m.o:	persistent_collection_m.f90
+	$(FORTRAN) $(FCFLAGS) persistent_collection_m.f90
 
 student_m.o:	student_m.f90
 	${FORTRAN} ${FCFLAGS} student_m.f90
@@ -43,7 +44,7 @@ fsqlite.o:	fsqlite.f90
 .PHONY: clean deploy
 
 clean:
-	rm *.core *.o *.mod libfsqlite.a cgi/api.cgi
+	rm *.o *.mod libfsqlite.a cgi/api.cgi
 
 schema:
 	- rm students.db.bak 
