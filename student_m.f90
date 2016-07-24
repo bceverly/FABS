@@ -10,11 +10,9 @@ module student_m
         character(len=80) :: first_name_m
         character(len=80) :: last_name_m
         integer :: id_m
-        type(SQLITE_COLUMN), dimension(:), pointer :: column_m
     contains
         procedure, public, pass(this) :: write_json, &
-                                         initialize, &
-                                         get_sqlite_columns
+                                         initialize
     end type student_t
 
 contains
@@ -44,18 +42,4 @@ contains
         print '(a,a,i5)', indent_string, '  "id": ', this%id_m
         print '(a,a)', indent_string, '}'
     end subroutine
-
-    function get_sqlite_columns(this) result(column)
-        class(student_t), intent(inout) :: this
-        type(SQLITE_COLUMN), dimension(:), pointer :: column
-
-        if (associated(this%column_m)) deallocate(this%column_m)
-        allocate(this%column_m(3))
-        call sqlite3_column_query(this%column_m(1), 'first_name', SQLITE_CHAR)
-        call sqlite3_column_query(this%column_m(2), 'last_name', SQLITE_CHAR)
-        call sqlite3_column_query(this%column_m(3), 'id', SQLITE_INT)
-
-        column => this%column_m
-    end function get_sqlite_columns
-
 end module student_m
