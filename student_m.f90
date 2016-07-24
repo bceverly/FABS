@@ -12,11 +12,11 @@ module student_m
         integer :: id_m
     contains
         procedure, public, pass(this) :: write_json, &
-                                         initialize
+                                         load_data
     end type student_t
 
 contains
-    subroutine initialize(this, first, last, id)
+    subroutine load_data(this, first, last, id)
         class(student_t), intent(inout) :: this
         character(len=*), intent(in) :: first
         character(len=*), intent(in) :: last
@@ -25,7 +25,7 @@ contains
         this%first_name_m = first
         this%last_name_m = last
         this%id_m = id
-    end subroutine initialize
+    end subroutine load_data
 
     subroutine write_json(this, indent_level)
         class(student_t), intent(in) :: this

@@ -68,7 +68,7 @@ contains
             call sqlite3_get_column(column(2), last_name)
             call sqlite3_get_column(column(3), id)
 
-            call this%students_m(i)%initialize(first_name, last_name, id)
+            call this%students_m(i)%load_data(first_name, last_name, id)
             i = i + 1
         enddo
 
