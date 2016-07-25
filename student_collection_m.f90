@@ -6,70 +6,32 @@ module student_collection_m
     implicit none
     private
 
-    type, public :: student_collection_t
+    type, public, extends(persistent_collection_t) :: student_collection_t
         private
             type(student_t), dimension(:), pointer :: students_m
 
         contains
             procedure, public, pass(this) :: read_students, &
                                              print_students, &
-                                             get_count
+                                             map_object
     end type student_collection_t
 
 contains
-    integer function get_count(this)
-        class(student_collection_t), intent(inout) :: this
-
-        get_count = 0
-        if (associated(this%students_m)) get_count = size(this%students_m)
-    end function get_count
-
     subroutine read_students(this)
         class(student_collection_t), intent(inout) :: this
 
-        type(SQLITE_DATABASE) :: db
-        type(SQLITE_COLUMN), dimension(:), pointer :: column
-        type(SQLITE_STATEMENT) :: stmt
-
-        logical :: finished
-        character(len=80) :: first_name
-        character(len=80) :: last_name
-        integer :: id, num_rows, i
-        type(student_t) :: the_student
-        type(persistent_collection_t) :: store
         character(len=80) :: db_name = 'students.db'
         character(len=80) :: table_name = 'student'
+        character(len=80) :: fn_label = 'first_name'
+        character(len=80) :: ln_label = 'last_name'
+        character(len=80) :: id_label = 'id'
 
-        store = persistent_collection_t(db_name)
-        num_rows = store%get_row_count(table_name)
-        
-        if (associated(this%students_m)) deallocate(this%students_m)
-
-        call sqlite3_open('students.db', db)
-
-        allocate(this%students_m(num_rows))
-        allocate(column(3))
-
-        call sqlite3_column_query(column(1), 'first_name', SQLITE_CHAR)
-        call sqlite3_column_query(column(2), 'last_name', SQLITE_CHAR)
-        call sqlite3_column_query(column(3), 'id', SQLITE_INT)
-
-        call sqlite3_prepare_select(db, 'student', column, stmt, '')
-
-        i = 1
-        do
-            call sqlite3_next_row(stmt, column, finished)
-            if (finished) exit
-
-            call sqlite3_get_column(column(1), first_name)
-            call sqlite3_get_column(column(2), last_name)
-            call sqlite3_get_column(column(3), id)
-
-            call this%students_m(i)%load_data(first_name, last_name, id)
-            i = i + 1
-        enddo
-
-        deallocate(column)
+        call this%set_db_name(db_name)
+        call this%set_table_name(table_name)
+        call this%add_db_char_column(fn_label)
+        call this%add_db_char_column(ln_label)
+        call this%add_db_int_column(id_label)
+        call this%read_all()
     end subroutine read_students
 
     subroutine print_students(this)
@@ -81,5 +43,34 @@ contains
             call this%students_m(i)%write_json(1)
         enddo
     end subroutine print_students
+
+    subroutine map_object(this)
+        class(student_collection_t), intent(inout) :: this
+
+        character(len=80) :: first_name
+        character(len=80) :: last_name
+        integer :: id
+        type(student_t) :: new_student
+        type(student_t), dimension(:), pointer :: temp_student_array
+
+        call sqlite3_get_column(this%column_m(1), first_name)
+        call sqlite3_get_column(this%column_m(2), last_name)
+        call sqlite3_get_column(this%column_m(3), id)
+
+        call new_student%load_data(first_name, last_name, id)
+        
+        if (associated(this%students_m)) then
+            allocate(temp_student_array(size(this%students_m)+1))
+            temp_student_array = this%students_m
+            deallocate(this%students_m)
+            allocate(this%students_m(size(temp_student_array)))
+            this%students_m = temp_student_array
+            deallocate(temp_student_array)
+            this%students_m(size(this%students_m)) = new_student
+        else
+            allocate(this%students_m(1))
+            this%students_m(1) = new_student
+        end if
+    end subroutine map_object
 
 end module student_collection_m

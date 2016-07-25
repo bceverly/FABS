@@ -13,7 +13,7 @@ program api
     call get_environment_variable("REQUEST_METHOD", request_method)
 
     call students%read_students()
-    call response%write_success_header(students%get_count(), object_name)
+    call response%write_success_header(students%get_row_count(), object_name)
     call students%print_students()
 
     print '(a)', '  ]'
