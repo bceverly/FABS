@@ -25,14 +25,14 @@ module persistent_collection_m
 contains
     subroutine set_db_name(this, db_name)
         class(persistent_collection_t) :: this
-        character(len=80) :: db_name
+        character(len=*) :: db_name
 
         this%db_name_m = db_name
     end subroutine set_db_name
 
     subroutine set_table_name(this, table_name)
         class(persistent_collection_t) :: this
-        character(len=80) :: table_name
+        character(len=*) :: table_name
 
         this%table_name_m = table_name
     end subroutine set_table_name
@@ -67,21 +67,21 @@ contains
 
     subroutine add_db_char_column(this, col_name)
         class(persistent_collection_t), intent(inout) :: this
-        character(len=80) :: col_name
+        character(len=*) :: col_name
 
         call add_db_column(this, col_name, SQLITE_CHAR)
     end subroutine add_db_char_column
 
     subroutine add_db_int_column(this, col_name)
         class(persistent_collection_t), intent(inout) :: this
-        character(len=80) :: col_name
+        character(len=*) :: col_name
 
         call add_db_column(this, col_name, SQLITE_INT)
     end subroutine add_db_int_column
 
     subroutine add_db_column(this, col_name, col_type)
         class(persistent_collection_t), intent(inout) :: this
-        character(len=80) :: col_name
+        character(len=*) :: col_name
         integer :: col_type
         type(SQLITE_COLUMN), dimension(:), pointer :: temp_column
 

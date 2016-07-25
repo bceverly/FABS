@@ -20,17 +20,11 @@ contains
     subroutine read_students(this)
         class(student_collection_t), intent(inout) :: this
 
-        character(len=80) :: db_name = 'students.db'
-        character(len=80) :: table_name = 'student'
-        character(len=80) :: fn_label = 'first_name'
-        character(len=80) :: ln_label = 'last_name'
-        character(len=80) :: id_label = 'id'
-
-        call this%set_db_name(db_name)
-        call this%set_table_name(table_name)
-        call this%add_db_char_column(fn_label)
-        call this%add_db_char_column(ln_label)
-        call this%add_db_int_column(id_label)
+        call this%set_db_name('students.db')
+        call this%set_table_name('student')
+        call this%add_db_char_column('first_name')
+        call this%add_db_char_column('last_name')
+        call this%add_db_int_column('id')
         call this%read_all()
     end subroutine read_students
 
@@ -66,11 +60,11 @@ contains
             allocate(this%students_m(size(temp_student_array)))
             this%students_m = temp_student_array
             deallocate(temp_student_array)
-            this%students_m(size(this%students_m)) = new_student
         else
             allocate(this%students_m(1))
-            this%students_m(1) = new_student
         end if
+
+        this%students_m(size(this%students_m)) = new_student
     end subroutine map_object
 
 end module student_collection_m
