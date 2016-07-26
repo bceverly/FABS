@@ -1,10 +1,10 @@
 program api
     use student_collection_m
+    use student_json_m
     use http_content_types
-    use http_response_m
     implicit none
 
-    type(http_response_t) :: response
+    type(student_json_t) :: response
     type(student_collection_t) :: students
 
     character(len=4096) :: path_info, request_method
@@ -16,9 +16,5 @@ program api
     call get_environment_variable("REQUEST_METHOD", request_method)
 
     call students%read_students()
-    call response%write_success_header(students%get_row_count(), 'student')
-    call students%print_students()
-
-    print '(a)', '  ]'
-    call response%write_success_footer()
+    call response%write_success(students)
 end program api

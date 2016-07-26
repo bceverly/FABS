@@ -8,17 +8,21 @@ module persistent_collection_m
         private
             character(:), allocatable :: db_name_m
             character(:), allocatable :: table_name_m
+            character(:), allocatable :: object_name_m
             type(SQLITE_COLUMN), dimension(:), pointer, public :: column_m
 
     contains
         procedure, public, pass(this) :: set_db_name, &
                                          set_table_name, &
+                                         set_object_name, &
                                          add_db_column, &
                                          add_db_char_column, &
                                          add_db_int_column, &
+                                         get_object_name, &
                                          get_row_count, &
                                          map_object, &
-                                         read_all
+                                         read_all, &
+                                         write_json
 
     end type persistent_collection_t
 
@@ -36,6 +40,22 @@ contains
 
         this%table_name_m = table_name
     end subroutine set_table_name
+
+    subroutine set_object_name(this, object_name)
+        class(persistent_collection_t) :: this
+        character(len=*) :: object_name
+
+        this%object_name_m = object_name
+    end subroutine set_object_name
+
+    character(len=80) function get_object_name(this)
+        class(persistent_collection_t) :: this
+
+        character(len=80) :: temp_name
+        
+        temp_name = this%object_name_m
+        get_object_name = temp_name
+    end function get_object_name
 
     integer function get_row_count(this)
         class(persistent_collection_t) :: this
@@ -122,5 +142,10 @@ contains
 
         call sqlite3_close(db)
     end subroutine read_all
+
+    subroutine write_json(this)
+        class(persistent_collection_t), intent(inout) :: this
+
+    end subroutine write_json
 
 end module persistent_collection_m

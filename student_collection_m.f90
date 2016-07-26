@@ -12,7 +12,7 @@ module student_collection_m
 
         contains
             procedure, public, pass(this) :: read_students, &
-                                             print_students, &
+                                             write_json, &
                                              map_object
     end type student_collection_t
 
@@ -22,13 +22,14 @@ contains
 
         call this%set_db_name('students.db')
         call this%set_table_name('student')
+        call this%set_object_name('student')
         call this%add_db_char_column('first_name')
         call this%add_db_char_column('last_name')
         call this%add_db_int_column('id')
         call this%read_all()
     end subroutine read_students
 
-    subroutine print_students(this)
+    subroutine write_json(this)
         class(student_collection_t), intent(inout) :: this
 
         integer :: i
@@ -36,7 +37,7 @@ contains
         do i=1, size(this%students_m)
             call this%students_m(i)%write_json(1)
         enddo
-    end subroutine print_students
+    end subroutine write_json
 
     subroutine map_object(this)
         class(student_collection_t), intent(inout) :: this
