@@ -7,7 +7,7 @@ module http_response_m
 
     type, public :: http_response_t
         private
-            integer :: content_type_m = TYPE_JSON
+            integer :: content_type_m = TYPE_HTML
             integer :: response_status_m = 500
 
         contains
@@ -15,6 +15,7 @@ module http_response_m
                                          set_response_status, &
                                          write_content_type_header, &
                                          write_response_status, &
+                                         write_headers, &
                                          write_error, &
                                          write_success_header, &
                                          write_success_footer
@@ -45,8 +46,6 @@ contains
         class(http_response_t), intent(inout) :: this
 
         select case (this%content_type_m)
-            case(TYPE_TEXT)
-                print '(a)', 'Content-Type: text/plain'
             case(TYPE_JSON)
                 print '(a)', 'Content-Type: application/json'
             case(TYPE_XML)
@@ -58,6 +57,15 @@ contains
         end select
     end subroutine write_content_type_header
 
+    subroutine write_headers(this)
+        class(http_response_t), intent(inout) :: this
+
+        call this%write_content_type_header()
+        call this%write_response_status()
+
+        print '(a)', ''
+    end subroutine write_headers
+
     subroutine write_error(this, error_msg)
         class(http_response_t), intent(inout) :: this
         character(len=80), intent(in) :: error_msg
@@ -65,10 +73,8 @@ contains
         this%content_type_m = TYPE_JSON
         this%response_status_m = 500
 
-        call this%write_content_type_header()
-        call this%write_response_status()
+        call this%write_headers()
 
-        print '(a)', ''
         print '(a)', '{'
         print '(a)', '  "status": "', error_msg, '",'
         print '(a)', '  "count": 0,'
@@ -80,11 +86,10 @@ contains
     subroutine write_success_header(this, num_objects, object_type)
         class(http_response_t), intent(inout) :: this
         integer, intent(in) :: num_objects
-        character(len=80), intent(in) :: object_type
+        character(len=*), intent(in) :: object_type
 
-        call write_content_type_header(this)
-        call this%write_response_status()
-        print '(a)', ''
+        call this%write_headers()
+
         print '(a)', '{'
         print '(a)', '  "status": "success",'
         print '(a,i5,a)', '  "count": ', num_objects, ','

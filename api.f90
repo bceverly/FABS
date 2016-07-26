@@ -7,7 +7,6 @@ program api
     type(http_response_t) :: response
     type(student_collection_t) :: students
 
-    character(len=80) :: object_name = "student"
     character(len=4096) :: path_info, request_method
 
     call response%set_content_type(TYPE_JSON)
@@ -17,7 +16,7 @@ program api
     call get_environment_variable("REQUEST_METHOD", request_method)
 
     call students%read_students()
-    call response%write_success_header(students%get_row_count(), object_name)
+    call response%write_success_header(students%get_row_count(), 'student')
     call students%print_students()
 
     print '(a)', '  ]'
