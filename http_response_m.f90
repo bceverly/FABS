@@ -68,7 +68,7 @@ contains
 
     subroutine write_error(this, error_msg)
         class(http_response_t), intent(inout) :: this
-        character(len=80), intent(in) :: error_msg
+        character(len=*), intent(in) :: error_msg
 
         this%content_type_m = TYPE_JSON
         this%response_status_m = 500
