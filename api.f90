@@ -9,7 +9,7 @@ program api
 
     character(len=4096) :: path_info, request_method
 
-    call response%set_content_type(TYPE_JSON)
+    call response%set_content_type(TYPE_XML)
     call response%set_response_status(200)
 
     call get_environment_variable("PATH_INFO", path_info)

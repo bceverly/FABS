@@ -22,7 +22,8 @@ module persistent_collection_m
                                          get_row_count, &
                                          map_object, &
                                          read_all, &
-                                         write_json
+                                         write_json, &
+                                         write_xml
 
     end type persistent_collection_t
 
@@ -147,5 +148,10 @@ contains
         class(persistent_collection_t), intent(inout) :: this
 
     end subroutine write_json
+
+    subroutine write_xml(this)
+        class(persistent_collection_t), intent(inout) :: this
+
+    end subroutine write_xml
 
 end module persistent_collection_m

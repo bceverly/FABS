@@ -4,11 +4,12 @@ FCFLAGS = -c
 cgi/api.cgi:	libfsqlite.a student_m.o api_errors.o http_response_m.o \
 	        http_response_codes.o student_collection_m.o \
 		persistent_collection_m.o http_content_types.o api.f90 \
-		xml_payload_m.o json_payload_m.o student_json_m.o
+		xml_payload_m.o json_payload_m.o student_json_m.o \
+		student_xml_m.o
 	${FORTRAN} -o cgi/api.cgi api.f90 student_m.o api_errors.o \
 	    student_collection_m.o http_response_codes.o http_content_types.o \
 	    persistent_collection_m.o json_payload_m.o xml_payload_m.o \
-	    http_response_m.o student_json_m.o \
+	    http_response_m.o student_json_m.o student_xml_m.o \
 	    -L/usr/lib -lsqlite3 -L. -lfsqlite
 
 api_errors.o:	api_errors.f90 http_response_m.o
@@ -37,6 +38,10 @@ json_payload_m.o:	http_response_m.o json_payload_m.f90
 student_json_m.o:	json_payload_m.o student_collection_m.o \
     student_json_m.f90
 	${FORTRAN} ${FCFLAGS} student_json_m.f90
+
+student_xml_m.o:	xml_payload_m.o student_collection_m.o \
+    student_xml_m.f90
+	${FORTRAN} ${FCFLAGS} student_xml_m.f90
 
 http_response_codes.o:	http_response_codes.f90
 	${FORTRAN} ${FCFLAGS} http_response_codes.f90

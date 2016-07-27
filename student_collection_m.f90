@@ -13,6 +13,7 @@ module student_collection_m
         contains
             procedure, public, pass(this) :: read_students, &
                                              write_json, &
+                                             write_xml, &
                                              map_object
     end type student_collection_t
 
@@ -38,6 +39,16 @@ contains
             call this%students_m(i)%write_json(1)
         enddo
     end subroutine write_json
+
+    subroutine write_xml(this)
+        class(student_collection_t), intent(inout) :: this
+
+        integer :: i
+
+        do i=1, size(this%students_m)
+            call this%students_m(i)%write_xml(1)
+        enddo
+    end subroutine write_xml
 
     subroutine map_object(this)
         class(student_collection_t), intent(inout) :: this
