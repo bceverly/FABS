@@ -20,8 +20,10 @@ module persistent_collection_m
                                          add_db_int_column, &
                                          get_object_name, &
                                          get_row_count, &
+                                         get_collection_size, &
                                          map_object, &
                                          read_all, &
+                                         read_one, &
                                          write_json, &
                                          write_xml
 
@@ -125,6 +127,11 @@ contains
         class(persistent_collection_t), intent(inout) :: this
     end subroutine map_object
 
+    integer function get_collection_size(this)
+        class(persistent_collection_t), intent(in) :: this
+
+    end function get_collection_size
+
     subroutine read_all(this)
         class(persistent_collection_t), intent(inout) :: this
 
@@ -143,6 +150,26 @@ contains
 
         call sqlite3_close(db)
     end subroutine read_all
+
+    subroutine read_one(this, id)
+        class(persistent_collection_t), intent(inout) :: this
+        integer :: id
+
+        type(SQLITE_DATABASE) :: db
+        type(SQLITE_STATEMENT) :: stmt
+        logical :: finished
+        character(len=80) :: where_clause
+
+        write (where_clause, *) 'where id=', id
+
+        call sqlite3_open(this%db_name_m, db)
+        call sqlite3_prepare_select(db, this%table_name_m, this%column_m, &
+            stmt, where_clause)
+        call sqlite3_next_row(stmt, this%column_m, finished)
+        if (.NOT. finished) call this%map_object
+
+        call sqlite3_close(db)
+    end subroutine read_one
 
     subroutine write_json(this)
         class(persistent_collection_t), intent(inout) :: this

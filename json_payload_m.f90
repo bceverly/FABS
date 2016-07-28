@@ -40,7 +40,7 @@ contains
 
         print '(a)', '{'
         print '(a)', '    "status": "success",'
-        print '(a,i9,a)', '    "count": ', the_data%get_row_count(), ','
+        print '(a,i9,a)', '    "count": ', the_data%get_collection_size(), ','
         print '(a,a,a)', '    "type": "', trim(the_data%get_object_name()), '",'
         print '(a)', '    "results": ['
 

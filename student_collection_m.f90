@@ -12,9 +12,11 @@ module student_collection_m
 
         contains
             procedure, public, pass(this) :: read_students, &
+                                             read_student, &
                                              write_json, &
                                              write_xml, &
-                                             map_object
+                                             map_object, &
+                                             get_collection_size
     end type student_collection_t
 
 contains
@@ -29,6 +31,19 @@ contains
         call this%add_db_int_column('id')
         call this%read_all()
     end subroutine read_students
+
+    subroutine read_student(this, id)
+        class(student_collection_t), intent(inout) :: this
+        integer, intent(in) :: id
+
+        call this%set_db_name('students.db')
+        call this%set_table_name('student')
+        call this%set_object_name('student')
+        call this%add_db_char_column('first_name')
+        call this%add_db_char_column('last_name')
+        call this%add_db_int_column('id')
+        call this%read_one(id)
+    end subroutine read_student
 
     subroutine write_json(this)
         class(student_collection_t), intent(inout) :: this
@@ -78,5 +93,15 @@ contains
 
         this%students_m(size(this%students_m)) = new_student
     end subroutine map_object
+
+    integer function get_collection_size(this)
+        class(student_collection_t), intent(in) :: this
+
+        if (associated(this%students_m)) then
+            get_collection_size = size(this%students_m)
+        else
+            get_collection_size = 0
+        end if
+    end function get_collection_size
 
 end module student_collection_m
