@@ -20,6 +20,11 @@ program api
     character(len=80), dimension(:), pointer :: path_elements
     type(query_string_variable_t), dimension(:), pointer :: qs_variables
     character(len=80) :: msg
+    character(len=4096) :: path
+    character(len=4096) :: query_str
+
+    path = url_decode(request%get_path_info())
+    query_str = url_decode(request%get_query_string())
 
     if (request%get_http_accept() == 'application/xml') then
         response => xml_response
@@ -29,30 +34,27 @@ program api
         call response%set_content_type(TYPE_JSON)
     end if
 
-    num_elements = get_num_path_elements(request%get_path_info())
+    num_elements = get_num_path_elements(path)
     allocate(path_elements(num_elements))
-    call get_path_elements(request%get_path_info(), path_elements)
+    call get_path_elements(path, path_elements)
 
     if (path_elements(1) /= 'api') then
         call response%set_response_status(RESPONSE_NOT_FOUND)
-        call response%write_error('Invalid API path - ' &
-            // request%get_path_info())
+        call response%write_error('Invalid API path - ' // path)
 
         call exit(0)
     end if
 
     select case(path_elements(2))
         case ('person')
-            if (len_trim(request%get_query_string()) == 0) then
+            if (len_trim(query_str) == 0) then
                 call response%set_response_status(RESPONSE_OK)
                 call students%read_students()
                 call response%write_success(students)
             else
-                num_variables = &
-                    get_num_query_string_variables(request%get_query_string())
+                num_variables = get_num_query_string_variables(query_str)
                 allocate(qs_variables(num_variables))
-                call get_query_string_variables(request%get_query_string(), &
-                    qs_variables)
+                call get_query_string_variables(query_str, qs_variables)
                 if (qs_variables(1)%the_name /= 'id') then
                     call response%set_response_status(RESPONSE_NOT_FOUND)
                     call response%write_error('Invalid object id name - ' &
