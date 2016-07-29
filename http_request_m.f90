@@ -21,6 +21,7 @@ module http_request_m
             character(len=4096) :: server_port_m = ''
             character(len=4096) :: server_protocol_m = ''
             character(len=4096) :: server_software_m = ''
+            character(len=4096) :: http_accept_m = ''
 
         contains
             procedure, public, pass(this) :: get_auth_type, &
@@ -39,7 +40,8 @@ module http_request_m
                                              get_server_name, &
                                              get_server_port, &
                                              get_server_protocol, &
-                                             get_server_software
+                                             get_server_software, &
+                                             get_http_accept
 
     end type http_request_t
 
@@ -220,5 +222,16 @@ contains
 
         get_server_software = this%server_software_m
     end function get_server_software
+
+    character(len=4096) function get_http_accept(this)
+        class(http_request_t), intent(inout) :: this
+
+        if (len_trim(this%http_accept_m) == 0) then
+            call get_environment_variable("HTTP_ACCEPT", &
+                this%http_accept_m)
+        end if
+
+        get_http_accept = this%http_accept_m
+    end function get_http_accept
 
 end module http_request_m

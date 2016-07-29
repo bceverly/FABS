@@ -1,7 +1,9 @@
 program api
     use student_collection_m
     use student_json_m
+    use student_xml_m
     use http_request_m
+    use http_response_m
     use http_content_types
     use http_response_codes
     use url_helper
@@ -9,7 +11,9 @@ program api
 
     implicit none
 
-    type(student_json_t) :: response
+    class(http_response_t), pointer :: response
+    type(student_xml_t), target :: xml_response
+    type(student_json_t), target :: json_response
     type(student_collection_t) :: students
     type(http_request_t) :: request
     integer :: num_elements, num_variables, i, id, status_val
@@ -17,7 +21,13 @@ program api
     type(query_string_variable_t), dimension(:), pointer :: qs_variables
     character(len=80) :: msg
 
-    call response%set_content_type(TYPE_JSON)
+    if (request%get_http_accept() == 'application/xml') then
+        response => xml_response
+        call response%set_content_type(TYPE_XML)
+    else
+        response => json_response
+        call response%set_content_type(TYPE_JSON)
+    end if
 
     num_elements = get_num_path_elements(request%get_path_info())
     allocate(path_elements(num_elements))
