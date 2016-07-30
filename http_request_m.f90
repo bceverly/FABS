@@ -282,7 +282,7 @@ contains
 
         if (.not. associated(this%path_elements_m)) then
             path_str = url_decode(this%get_path_info())
-            num_elements = get_num_path_elements(path_str)
+            num_elements = get_num_uri_elements(path_str)
             allocate(this%path_elements_m(num_elements))
             call split_path(path_str, this%path_elements_m)
         end if
@@ -300,9 +300,9 @@ contains
 
         if (.not. associated(this%query_strings_m)) then
             query_str = url_decode(this%get_query_string())
-            num_elements = get_num_query_string_variables(query_str)
+            num_elements = get_num_attributes(query_str)
             allocate(this%query_strings_m(num_elements))
-            call get_query_string_variables(query_str, this%query_strings_m)
+            call get_attribute_value_pairs(query_str, this%query_strings_m)
         end if
 
         query_strings => this%query_strings_m

@@ -7,27 +7,27 @@ module url_helper
         character(len=80) :: the_value
     end type attribute_value_pair_t
 
-    public :: get_num_path_elements, &
+    public :: get_num_uri_elements, &
               split_path, &
-              get_num_query_string_variables, &
-              get_query_string_variables, &
+              get_num_attributes, &
+              get_attribute_value_pairs, &
               url_decode
 
 contains
-    integer function get_num_path_elements(url_str)
+    integer function get_num_uri_elements(url_str)
         character(len=*), intent(in) :: url_str
 
         integer :: i
 
-        get_num_path_elements = 0
+        get_num_uri_elements = 0
         do i=1,len_trim(url_str)
             if (url_str(i:i) == '/') then
-                get_num_path_elements = get_num_path_elements + 1
+                get_num_uri_elements = get_num_uri_elements + 1
             end if
 
             if (url_str(i:i) == '?') exit
         end do
-    end function get_num_path_elements
+    end function get_num_uri_elements
 
     subroutine split_path(url_str, elements)
         character(len=*), intent(in) :: url_str
@@ -50,27 +50,27 @@ contains
         elements(element) = url_str(start:cur)
     end subroutine split_path
 
-    integer function get_num_query_string_variables(query_str)
-        character(len=*), intent(in) :: query_str
+    integer function get_num_attributes(input_str)
+        character(len=*), intent(in) :: input_str
 
         integer :: i
 
-        if (len_trim(query_str) > 0) then
-            get_num_query_string_variables = 1
+        if (len_trim(input_str) > 0) then
+            get_num_attributes = 1
         else
-            get_num_query_string_variables = 0
+            get_num_attributes = 0
         end if
 
-        do i=1,len_trim(query_str)
-            if (query_str(i:i) == '&') then
-                get_num_query_string_variables = &
-                    get_num_query_string_variables + 1
+        do i=1,len_trim(input_str)
+            if (input_str(i:i) == '&') then
+                get_num_attributes = &
+                    get_num_attributes + 1
             end if
         end do
-    end function get_num_query_string_variables
+    end function get_num_attributes
 
-    subroutine get_query_string_variables(query_str, results)
-        character(len=*), intent(in) :: query_str
+    subroutine get_attribute_value_pairs(input_str, results)
+        character(len=*), intent(in) :: input_str
         type(attribute_value_pair_t), dimension(:), intent(out) :: results
 
         integer :: cur, start, pos, var
@@ -78,9 +78,9 @@ contains
 
         start = 1
         pos = 1
-        do cur=1,len_trim(query_str)
-            if (query_str(cur:cur) == '&') then
-                chunk = query_str(start:cur-1)
+        do cur=1,len_trim(input_str)
+            if (input_str(cur:cur) == '&') then
+                chunk = input_str(start:cur-1)
                 start = cur + 1
 
                 results(pos)%the_attribute = ''
@@ -100,7 +100,7 @@ contains
 
         results(pos)%the_attribute = ''
         results(pos)%the_value = ''
-        chunk = query_str(start:cur)
+        chunk = input_str(start:cur)
         do var=1,len_trim(chunk)
             if (chunk(var:var) == '=') then
                 results(pos)%the_attribute = chunk(1:var-1)
@@ -108,7 +108,7 @@ contains
             end if
         end do
         if (results(pos)%the_attribute == '') results(pos)%the_attribute = chunk
-    end subroutine get_query_string_variables
+    end subroutine get_attribute_value_pairs
 
     character(len=80) function url_decode(input_string)
         character(len=*), intent(in) :: input_string
