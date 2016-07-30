@@ -1,11 +1,14 @@
 module http_request_m
+    use string_utils
+    use url_helper
+
     implicit none
     private
 
     type, public :: http_request_t
         private
             character(len=4096) :: auth_type_m = ''
-            character(len=4096) :: content_length_m = ''
+            integer :: content_length_m = 0
             character(len=4096) :: content_type_m = ''
             character(len=4096) :: gateway_interface_m = ''
             character(len=4096) :: path_info_m = ''
@@ -22,6 +25,10 @@ module http_request_m
             character(len=4096) :: server_protocol_m = ''
             character(len=4096) :: server_software_m = ''
             character(len=4096) :: http_accept_m = ''
+            character(len=4096) :: request_body_m = ''
+            character(len=80), dimension(:), pointer :: path_elements_m
+            type(query_string_variable_t), dimension(:), pointer :: &
+                query_strings_m
 
         contains
             procedure, public, pass(this) :: get_auth_type, &
@@ -41,7 +48,10 @@ module http_request_m
                                              get_server_port, &
                                              get_server_protocol, &
                                              get_server_software, &
-                                             get_http_accept
+                                             get_http_accept, &
+                                             get_request_body, &
+                                             get_path_elements, &
+                                             get_query_strings
 
     end type http_request_t
 
@@ -56,12 +66,21 @@ contains
         get_auth_type = this%auth_type_m
     end function get_auth_type
 
-    character(len=4096) function get_content_length(this)
+    integer function get_content_length(this)
         class(http_request_t), intent(inout) :: this
 
-        if (len_trim(this%content_length_m) == 0) then
-            call get_environment_variable("CONTENT_LENGTH", &
-                this%content_length_m)
+        character(len=4096) :: temp_str
+        integer :: result_val, status_val
+
+        if (this%content_length_m == 0) then
+            call get_environment_variable("CONTENT_LENGTH", temp_str)
+            call str2int(temp_str, result_val, status_val)
+
+            if (status_val /= 0) then
+                this%content_length_m = 0
+            else
+                this%content_length_m = result_val
+            end if
         end if
 
         get_content_length = this%content_length_m
@@ -233,5 +252,60 @@ contains
 
         get_http_accept = this%http_accept_m
     end function get_http_accept
+
+    character(len=4096) function get_request_body(this)
+        class(http_request_t), intent(inout) :: this
+
+        integer :: body_size, i, bytes_read
+        character(len=1) :: in_char
+        body_size = this%get_content_length()
+
+        if (len_trim(this%request_body_m) == 0) then
+            this%request_body_m = repeat(' ', 4096)
+            do i=1,body_size
+                bytes_read = 0
+                read (5, '(a)', advance='no', size=body_size) in_char
+                this%request_body_m(i:i) = in_char
+            end do
+        end if
+
+        get_request_body = this%request_body_m
+    end function get_request_body
+
+    subroutine get_path_elements(this, path_elements)
+        class(http_request_t), intent(inout) :: this
+        character(len=80), dimension(:), pointer, intent(inout) :: &
+            path_elements
+
+        integer :: num_elements
+        character(len=4096) :: path_str
+
+        if (.not. associated(this%path_elements_m)) then
+            path_str = url_decode(this%get_path_info())
+            num_elements = get_num_path_elements(path_str)
+            allocate(this%path_elements_m(num_elements))
+            call split_path(path_str, this%path_elements_m)
+        end if
+
+        path_elements => this%path_elements_m
+    end subroutine get_path_elements
+
+    subroutine get_query_strings(this, query_strings)
+        class(http_request_t), intent(inout) :: this
+        type(query_string_variable_t), dimension(:), pointer, intent(inout) ::&
+            query_strings
+
+        integer :: num_elements
+        character(len=4096) :: query_str
+
+        if (.not. associated(this%query_strings_m)) then
+            query_str = url_decode(this%get_query_string())
+            num_elements = get_num_query_string_variables(query_str)
+            allocate(this%query_strings_m(num_elements))
+            call get_query_string_variables(query_str, this%query_strings_m)
+        end if
+
+        query_strings => this%query_strings_m
+    end subroutine get_query_strings
 
 end module http_request_m

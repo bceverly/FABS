@@ -8,7 +8,7 @@ module url_helper
     end type query_string_variable_t
 
     public :: get_num_path_elements, &
-              get_path_elements, &
+              split_path, &
               get_num_query_string_variables, &
               get_query_string_variables, &
               url_decode
@@ -29,7 +29,7 @@ contains
         end do
     end function get_num_path_elements
 
-    subroutine get_path_elements(url_str, elements)
+    subroutine split_path(url_str, elements)
         character(len=*), intent(in) :: url_str
         character(len=*), dimension(:), intent(out) :: elements
 
@@ -48,7 +48,7 @@ contains
             end if
         end do
         elements(element) = url_str(start:cur)
-    end subroutine get_path_elements
+    end subroutine split_path
 
     integer function get_num_query_string_variables(query_str)
         character(len=*), intent(in) :: query_str
