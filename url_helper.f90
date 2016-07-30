@@ -2,10 +2,10 @@ module url_helper
     implicit none
     private
 
-    type, public :: query_string_variable_t
-        character(len=80) :: the_name
+    type, public :: attribute_value_pair_t
+        character(len=80) :: the_attribute
         character(len=80) :: the_value
-    end type query_string_variable_t
+    end type attribute_value_pair_t
 
     public :: get_num_path_elements, &
               split_path, &
@@ -71,7 +71,7 @@ contains
 
     subroutine get_query_string_variables(query_str, results)
         character(len=*), intent(in) :: query_str
-        type(query_string_variable_t), dimension(:), intent(out) :: results
+        type(attribute_value_pair_t), dimension(:), intent(out) :: results
 
         integer :: cur, start, pos, var
         character(len=4096) :: chunk
@@ -83,29 +83,31 @@ contains
                 chunk = query_str(start:cur-1)
                 start = cur + 1
 
-                results(pos)%the_name = ''
+                results(pos)%the_attribute = ''
                 results(pos)%the_value = ''
                 do var=1,len_trim(chunk)
                     if (chunk(var:var) == '=') then
-                        results(pos)%the_name = chunk(1:var-1)
+                        results(pos)%the_attribute = chunk(1:var-1)
                         results(pos)%the_value = chunk(var+1:len_trim(chunk))
                     end if
                 end do
-                if (results(pos)%the_name == '') results(pos)%the_name = chunk
+                if (results(pos)%the_attribute == '') then
+                    results(pos)%the_attribute = chunk
+                end if    
                 pos = pos + 1
             end if
         end do
 
-        results(pos)%the_name = ''
+        results(pos)%the_attribute = ''
         results(pos)%the_value = ''
         chunk = query_str(start:cur)
         do var=1,len_trim(chunk)
             if (chunk(var:var) == '=') then
-                results(pos)%the_name = chunk(1:var-1)
+                results(pos)%the_attribute = chunk(1:var-1)
                 results(pos)%the_value = chunk(var+1:len_trim(chunk))
             end if
         end do
-        if (results(pos)%the_name == '') results(pos)%the_name = chunk
+        if (results(pos)%the_attribute == '') results(pos)%the_attribute = chunk
     end subroutine get_query_string_variables
 
     character(len=80) function url_decode(input_string)

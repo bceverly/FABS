@@ -27,7 +27,7 @@ module http_request_m
             character(len=4096) :: http_accept_m = ''
             character(len=4096) :: request_body_m = ''
             character(len=80), dimension(:), pointer :: path_elements_m
-            type(query_string_variable_t), dimension(:), pointer :: &
+            type(attribute_value_pair_t), dimension(:), pointer :: &
                 query_strings_m
 
         contains
@@ -292,7 +292,7 @@ contains
 
     subroutine get_query_strings(this, query_strings)
         class(http_request_t), intent(inout) :: this
-        type(query_string_variable_t), dimension(:), pointer, intent(inout) ::&
+        type(attribute_value_pair_t), dimension(:), pointer, intent(inout) ::&
             query_strings
 
         integer :: num_elements

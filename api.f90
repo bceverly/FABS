@@ -18,7 +18,7 @@ program api
     type(http_request_t) :: request
     integer :: num_elements, num_variables, i, id, status_val
     character(len=80), dimension(:), pointer :: path_elements
-    type(query_string_variable_t), dimension(:), pointer :: qs_variables
+    type(attribute_value_pair_t), dimension(:), pointer :: qs_variables
     character(len=80) :: msg
     character(len=4096) :: path
     character(len=4096) :: query_str
@@ -50,12 +50,12 @@ program api
                         call students%read_students()
                         call response%write_success(students)
                     else
-                        if (qs_variables(1)%the_name /= 'id') then
+                        if (qs_variables(1)%the_attribute /= 'id') then
                             call response%set_response_status( &
                                 RESPONSE_NOT_FOUND)
                             call response%write_error( &
                                 'Invalid object id name - ' &
-                                // qs_variables(1)%the_name)
+                                // qs_variables(1)%the_attribute)
                         else
                             call str2int(qs_variables(1)%the_value, id, &
                                 status_val)
