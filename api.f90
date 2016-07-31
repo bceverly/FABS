@@ -30,6 +30,7 @@ program api
     type(json_parser_t), target :: json_parser
     type(xml_parser_t), target :: xml_parser
 
+    ! Are we outputting JSON or XML?
     if (request%get_http_accept() == 'application/xml') then
         response => xml_response
         call response%set_content_type(TYPE_XML)
@@ -38,11 +39,14 @@ program api
         call response%set_content_type(TYPE_JSON)
     end if
 
+    if (request%get_content_type() == 'application/xml') then
+        parser => xml_parser
+    else
+        parser => json_parser
+    end if
+
     call request%get_path_elements(path_elements)
     call request%get_query_strings(qs_variables)
-
-    ! Default to json parser for now
-    parser => json_parser
 
     if (path_elements(1) /= 'api') then
         call response%set_response_status(RESPONSE_NOT_FOUND)
@@ -55,7 +59,7 @@ program api
         case ('student')
             select case (trim(request%get_request_method()))
                 case ('GET')
-                    if (len_trim(query_str) == 0) then
+                    if (len_trim(request%get_query_string()) == 0) then
                         call response%set_response_status(RESPONSE_OK)
                         call students%read_students()
                         call response%write_success(students)
@@ -102,6 +106,12 @@ program api
                             // trim(request%get_request_body()) // ')')
                     else
                         ! Successful parse
+                        call response%set_response_status(INTERNAL_SERVER_ERROR)
+                        write (msg, '(a,i5)'), 'Total attributes:', &
+                            size(parser%attribute_value_pairs_m)
+                        call response%write_error(msg)
+                        do i=1,size(parser%attribute_value_pairs_m)
+                        end do
                     end if
                 case ('DELETE')
                 case ('PUT')
