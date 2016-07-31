@@ -1,4 +1,5 @@
 module http_request_m
+    use attribute_value_pair_m
     use string_utils
     use url_helper
 

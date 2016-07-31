@@ -18,7 +18,8 @@ OBJFILES = ${OBJDIR}/student_m.o \
 	${OBJDIR}/student_json_m.o ${OBJDIR}/student_xml_m.o \
 	${OBJDIR}/http_request_m.o ${OBJDIR}/url_helper.o \
 	${OBJDIR}/string_utils.o ${OBJDIR}/json_parser_m.o \
-	${OBJDIR}/object_parser_m.o ${OBJDIR}/xml_parser_m.o
+	${OBJDIR}/object_parser_m.o ${OBJDIR}/xml_parser_m.o \
+	${OBJDIR}/attribute_value_pair_m.o
 
 cgi/api.cgi:	${LIBDIR}/libfsqlite.a ${OBJFILES}
 	${FORTRAN} -J${MODDIR} -o cgi/api.cgi api.f90 ${OBJFILES} \
@@ -30,7 +31,11 @@ ${OBJDIR}/api_errors.o:	api_errors.f90 ${OBJDIR}/http_response_m.o
 ${OBJDIR}/string_utils.o:	string_utils.f90
 	${FORTRAN} ${FCFLAGS} -o ${OBJDIR}/string_utils.o string_utils.f90
 
-${OBJDIR}/url_helper.o:	url_helper.f90
+${OBJDIR}/attribute_value_pair_m.o:	attribute_value_pair_m.f90
+	${FORTRAN} ${FCFLAGS} -o ${OBJDIR}/attribute_value_pair_m.o \
+			attribute_value_pair_m.f90
+
+${OBJDIR}/url_helper.o:	${OBJDIR}/attribute_value_pair_m.o url_helper.f90
 	${FORTRAN} ${FCFLAGS} -o ${OBJDIR}/url_helper.o url_helper.f90
 
 ${OBJDIR}/student_collection_m.o:	${OBJDIR}/student_m.o \

@@ -8,28 +8,16 @@ module xml_parser_m
         private
 
         contains
-            procedure, public, pass(this) :: parse, &
-                                             process_object, &
-                                             process_attribute_value_pair, &
-                                             process_error
+            procedure, public, pass(this) :: parse
 
     end type xml_parser_t
 
 contains
-    subroutine parse(this)
+    subroutine parse(this, raw_data)
         class(xml_parser_t), intent(inout) :: this
+        character(len=*), intent(in) :: raw_data
+
+        this%raw_data_m = raw_data
     end subroutine parse
-
-    subroutine process_object(this)
-        class(xml_parser_t), intent(inout) :: this
-    end subroutine process_object
-
-    subroutine process_attribute_value_pair(this)
-        class(xml_parser_t), intent(inout) :: this
-    end subroutine process_attribute_value_pair
-
-    subroutine process_error(this)
-        class(xml_parser_t), intent(inout) :: this
-    end subroutine process_error
 
 end module xml_parser_m

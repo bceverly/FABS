@@ -1,11 +1,8 @@
 module url_helper
+    use attribute_value_pair_m
+
     implicit none
     private
-
-    type, public :: attribute_value_pair_t
-        character(len=80) :: the_attribute
-        character(len=80) :: the_value
-    end type attribute_value_pair_t
 
     public :: get_num_uri_elements, &
               split_path, &
