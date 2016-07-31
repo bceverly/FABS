@@ -2,6 +2,7 @@ FORTRAN = egfortran
 FCFLAGS = -ggdb -c -J${MODDIR}
 
 BINDIR = ./bin
+CGIDIR = ./cgi
 DBDIR  = ./db
 LIBDIR = ./libs
 OBJDIR = ./objs
@@ -21,8 +22,8 @@ OBJFILES = ${OBJDIR}/student_m.o \
 	${OBJDIR}/object_parser_m.o ${OBJDIR}/xml_parser_m.o \
 	${OBJDIR}/attribute_value_pair_m.o
 
-cgi/api.cgi:	${LIBDIR}/libfsqlite.a ${OBJFILES} api.f90
-	${FORTRAN} -J${MODDIR} -o cgi/api.cgi api.f90 ${OBJFILES} \
+${CGIDIR}/api.cgi:	${LIBDIR}/libfsqlite.a ${OBJFILES} api.f90
+	${FORTRAN} -J${MODDIR} -o ${CGIDIR}/api.cgi api.f90 ${OBJFILES} \
 	    -L/usr/lib -lsqlite3 -L${LIBDIR} -lfsqlite
 
 ${OBJDIR}/api_errors.o:	api_errors.f90 ${OBJDIR}/http_response_m.o
@@ -112,8 +113,8 @@ schema:
 	- mv ${DBDIR}/students.db ${DBDIR}/students.db.bak 
 	sqlite3 -init ${DBDIR}/schema.sql ${DBDIR}/students.db ""
 
-deploy:
+deploy:	${CGIDIR}/api.cgi
 	doas /bin/sh ${BINDIR}/deploy.sh
 
-debug:
+debug: ${CGIDIR}/api.cgi
 	doas /bin/sh ${BINDIR}/deploy_debug.sh
