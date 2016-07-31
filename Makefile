@@ -1,11 +1,12 @@
 FORTRAN = egfortran
-FCFLAGS = -c -J${MODDIR}
+FCFLAGS = -ggdb -c -J${MODDIR}
 
 BINDIR = ./bin
 DBDIR  = ./db
 LIBDIR = ./libs
 OBJDIR = ./objs
 MODDIR = ./mods
+WEBDIR = /var/www
 
 OBJFILES = ${OBJDIR}/student_m.o \
 	${OBJDIR}/api_errors.o ${OBJDIR}/http_response_m.o \
@@ -16,7 +17,7 @@ OBJFILES = ${OBJDIR}/student_m.o \
 	${OBJDIR}/xml_payload_m.o ${OBJDIR}/json_payload_m.o \
 	${OBJDIR}/student_json_m.o ${OBJDIR}/student_xml_m.o \
 	${OBJDIR}/http_request_m.o ${OBJDIR}/url_helper.o \
-	${OBJDIR}/string_utils.o
+	${OBJDIR}/string_utils.o ${OBJDIR}/json_parser_m.o
 
 cgi/api.cgi:	${LIBDIR}/libfsqlite.a ${OBJFILES}
 	${FORTRAN} -J${MODDIR} -o cgi/api.cgi api.f90 ${OBJFILES} \
@@ -76,6 +77,9 @@ ${OBJDIR}/http_content_types.o:	http_content_types.f90
 	${FORTRAN} ${FCFLAGS} -o ${OBJDIR}/http_content_types.o \
 			http_content_types.f90
 
+${OBJDIR}/json_parser_m.o:	json_parser_m.f90
+	${FORTRAN} ${FCFLAGS} -o ${OBJDIR}/json_parser_m.o json_parser_m.f90
+
 ${LIBDIR}/libfsqlite.a:	${OBJDIR}/csqlite.o ${OBJDIR}/fsqlite.o
 	ar r ${LIBDIR}/libfsqlite.a ${OBJDIR}/fsqlite.o ${OBJDIR}/csqlite.o
 
@@ -97,3 +101,6 @@ schema:
 
 deploy:
 	doas /bin/sh ${BINDIR}/deploy.sh
+
+debug:
+	doas /bin/sh ${BINDIR}/deploy_debug.sh

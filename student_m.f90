@@ -7,8 +7,8 @@ module student_m
     type, public :: student_t
         private
 
-        character(len=80) :: first_name_m
-        character(len=80) :: last_name_m
+        character(len=80) :: first_name_m = ''
+        character(len=80) :: last_name_m = ''
         integer :: id_m
     contains
         procedure, public, pass(this) :: write_json, &
