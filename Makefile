@@ -17,7 +17,8 @@ OBJFILES = ${OBJDIR}/student_m.o \
 	${OBJDIR}/xml_payload_m.o ${OBJDIR}/json_payload_m.o \
 	${OBJDIR}/student_json_m.o ${OBJDIR}/student_xml_m.o \
 	${OBJDIR}/http_request_m.o ${OBJDIR}/url_helper.o \
-	${OBJDIR}/string_utils.o ${OBJDIR}/json_parser_m.o
+	${OBJDIR}/string_utils.o ${OBJDIR}/json_parser_m.o \
+	${OBJDIR}/object_parser_m.o ${OBJDIR}/xml_parser_m.o
 
 cgi/api.cgi:	${LIBDIR}/libfsqlite.a ${OBJFILES}
 	${FORTRAN} -J${MODDIR} -o cgi/api.cgi api.f90 ${OBJFILES} \
@@ -77,8 +78,15 @@ ${OBJDIR}/http_content_types.o:	http_content_types.f90
 	${FORTRAN} ${FCFLAGS} -o ${OBJDIR}/http_content_types.o \
 			http_content_types.f90
 
-${OBJDIR}/json_parser_m.o:	json_parser_m.f90
+${OBJDIR}/object_parser_m.o:	object_parser_m.f90
+	${FORTRAN} ${FCFLAGS} -o ${OBJDIR}/object_parser_m.o \
+			object_parser_m.f90
+
+${OBJDIR}/json_parser_m.o:	${OBJDIR}/object_parser_m.o json_parser_m.f90
 	${FORTRAN} ${FCFLAGS} -o ${OBJDIR}/json_parser_m.o json_parser_m.f90
+
+${OBJDIR}/xml_parser_m.o:	${OBJDIR}/object_parser_m.o xml_parser_m.f90
+	${FORTRAN} ${FCFLAGS} -o ${OBJDIR}/xml_parser_m.o xml_parser_m.f90
 
 ${LIBDIR}/libfsqlite.a:	${OBJDIR}/csqlite.o ${OBJDIR}/fsqlite.o
 	ar r ${LIBDIR}/libfsqlite.a ${OBJDIR}/fsqlite.o ${OBJDIR}/csqlite.o
