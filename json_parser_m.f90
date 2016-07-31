@@ -40,21 +40,26 @@ contains
                 if (.not. this%parsing_attribute_m .and. &
                     .not. this%parsing_value_m .and. &
                     .not. this%parsing_attribute_value_pair_m) then
+
+                    call this%add_attribute_value_pair()
                     this%parsing_attribute_m = .true.
                     this%parsing_attribute_value_pair_m = .true.
-                    str_pos = 0
+                    str_pos = 1
                 else if (this%parsing_attribute_m .and. &
                          .not. this%parsing_value_m .and. &
                          this%parsing_attribute_value_pair_m) then
+
                     this%parsing_attribute_m = .false.
                 else if (.not. this%parsing_attribute_m .and. &
                          .not. this%parsing_value_m .and. &
                          this%parsing_attribute_value_pair_m) then
+
                     this%parsing_value_m = .true.
-                    str_pos = 0
+                    str_pos = 1
                 else if (.not. this%parsing_attribute_m .and. &
                          this%parsing_value_m .and. &
                          this%parsing_attribute_value_pair_m) then
+
                     this%parsing_value_m = .false.
                     this%parsing_attribute_value_pair_m = .false.
                 else
@@ -63,12 +68,12 @@ contains
                 end if
             else
                 if (this%parsing_attribute_m) then
-                    call this%add_attribute_value_pair()
                     current_pos = size(this%attribute_value_pairs_m)
 
                     this%attribute_value_pairs_m(current_pos)% &
                         the_attribute(str_pos:str_pos) = raw_data(i:i)
                     str_pos = str_pos + 1
+
                 else if (this%parsing_value_m) then
                     current_pos = size(this%attribute_value_pairs_m)
 

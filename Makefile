@@ -21,7 +21,7 @@ OBJFILES = ${OBJDIR}/student_m.o \
 	${OBJDIR}/object_parser_m.o ${OBJDIR}/xml_parser_m.o \
 	${OBJDIR}/attribute_value_pair_m.o
 
-cgi/api.cgi:	${LIBDIR}/libfsqlite.a ${OBJFILES}
+cgi/api.cgi:	${LIBDIR}/libfsqlite.a ${OBJFILES} api.f90
 	${FORTRAN} -J${MODDIR} -o cgi/api.cgi api.f90 ${OBJFILES} \
 	    -L/usr/lib -lsqlite3 -L${LIBDIR} -lfsqlite
 

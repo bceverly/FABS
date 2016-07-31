@@ -259,6 +259,7 @@ contains
 
         integer :: body_size, i, bytes_read
         character(len=1) :: in_char
+
         body_size = this%get_content_length()
 
         if (len_trim(this%request_body_m) == 0) then

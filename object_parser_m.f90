@@ -58,7 +58,9 @@ contains
             allocate(temp_array(the_size+1))
             temp_array = this%attribute_value_pairs_m
             deallocate(this%attribute_value_pairs_m)
+            allocate(this%attribute_value_pairs_m(the_size+1))
             this%attribute_value_pairs_m = temp_array
+            deallocate(temp_array)
 
             this%attribute_value_pairs_m(the_size+1)%the_attribute = ''
             this%attribute_value_pairs_m(the_size+1)%the_value = ''

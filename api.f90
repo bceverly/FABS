@@ -7,6 +7,9 @@ program api
     use http_response_m
     use http_content_types
     use http_response_codes
+    use object_parser_m
+    use json_parser_m
+    use xml_parser_m
     use url_helper
     use string_utils
 
@@ -23,6 +26,9 @@ program api
     character(len=80) :: msg
     character(len=4096) :: path
     character(len=4096) :: query_str
+    class(object_parser_t), pointer :: parser
+    type(json_parser_t), target :: json_parser
+    type(xml_parser_t), target :: xml_parser
 
     if (request%get_http_accept() == 'application/xml') then
         response => xml_response
@@ -34,6 +40,9 @@ program api
 
     call request%get_path_elements(path_elements)
     call request%get_query_strings(qs_variables)
+
+    ! Default to json parser for now
+    parser => json_parser
 
     if (path_elements(1) /= 'api') then
         call response%set_response_status(RESPONSE_NOT_FOUND)
@@ -83,9 +92,17 @@ program api
                         end if
                     end if
                 case ('POST')
-                    call response%set_response_status(INTERNAL_SERVER_ERROR)
-                    call response%write_error('Request body - ' &
-                        // trim(request%get_request_body()))
+                    call parser%parse(request%get_request_body())
+
+                    if (parser%error_m) then
+                        ! We had some sort of parser error
+                        call response%set_response_status(INTERNAL_SERVER_ERROR)
+                        call response%write_error(parser%error_string_m // &
+                            '(Request body - ' &
+                            // trim(request%get_request_body()) // ')')
+                    else
+                        ! Successful parse
+                    end if
                 case ('DELETE')
                 case ('PUT')
             end select
