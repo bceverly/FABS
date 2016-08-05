@@ -1,10 +1,12 @@
 module student_m
+    use log_file_m
+    use persistent_object_m
     use sqlite
 
     implicit none
     private
 
-    type, public :: student_t
+    type, extends(persistent_object_t), public :: student_t
         private
 
         character(len=80) :: first_name_m = ''
@@ -13,7 +15,8 @@ module student_m
     contains
         procedure, public, pass(this) :: write_json, &
                                          write_xml, &
-                                         load_data
+                                         load_data, &
+                                         delete_existing
     end type student_t
 
 contains
@@ -59,4 +62,19 @@ contains
         print '(a,a,a,a)', indent_string, '    <id>', this%id_m, '</id>'
         print '(a,a)', indent_string, '</student>'
     end subroutine write_xml
+
+    subroutine delete_existing(this)
+        class(student_t), intent(inout) :: this
+
+        character(len=80) :: query
+
+        write (query, '(a,i5,a)') 'delete from student where id=', &
+            this%id_m, ';'
+
+        call this%set_db_name('db/students.db')
+        call this%open_database()
+        call sqlite3_do(this%db_m, query)
+        call this%close_database()
+    end subroutine delete_existing
+
 end module student_m

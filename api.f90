@@ -3,6 +3,7 @@ program api
     use student_collection_m
     use student_json_m
     use student_xml_m
+    use student_m
     use http_request_m
     use http_response_m
     use http_content_types
@@ -19,6 +20,7 @@ program api
     type(student_xml_t), target :: xml_response
     type(student_json_t), target :: json_response
     type(student_collection_t) :: students
+    type(student_t) :: student
     type(http_request_t) :: request
     integer :: num_elements, num_variables, i, id, status_val
     character(len=80), dimension(:), pointer :: path_elements
@@ -114,6 +116,42 @@ program api
                         end do
                     end if
                 case ('DELETE')
+                    if (len_trim(request%get_query_string()) == 0) then
+                        call response%set_response_status(RESPONSE_NOT_FOUND)
+                        call response%write_error('ID required')
+                    else
+                        if (qs_variables(1)%the_attribute /= 'id') then
+                            call response%set_response_status( &
+                                RESPONSE_NOT_FOUND)
+                            call response%write_error( &
+                                'Invalid object id name - ' &
+                                // qs_variables(1)%the_attribute)
+                        else
+                            call str2int(qs_variables(1)%the_value, id, &
+                                status_val)
+                            if (status_val /= 0) then
+                                call response%set_response_status( &
+                                    RESPONSE_NOT_FOUND)
+                                call response%write_error( &
+                                    'Invalid object id - ' &
+                                    // qs_variables(1)%the_value)
+                            else
+                                call students%read_student(id)
+                                if (students%get_collection_size() == 1) then
+                                    call students%students_m(1)%delete_existing()
+                                    call response%set_response_status( &
+                                        RESPONSE_OK)
+                                    call response%write_success(students)
+                                else
+                                    call response%set_response_status( &
+                                        RESPONSE_NOT_FOUND)
+                                    call response%write_error('Object id ' &
+                                        // trim(qs_variables(1)%the_value) &
+                                        // ' not found')
+                                end if
+                            end if
+                        end if
+                    end if
                 case ('PUT')
             end select
         case default

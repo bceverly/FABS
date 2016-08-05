@@ -85,6 +85,7 @@ contains
 
         deallocate(column)
 
+        call sqlite3_finalize(stmt)
         call sqlite3_close(db)
     end function get_row_count
 
@@ -166,8 +167,10 @@ contains
         call sqlite3_prepare_select(db, this%table_name_m, this%column_m, &
             stmt, where_clause)
         call sqlite3_next_row(stmt, this%column_m, finished)
+
         if (.NOT. finished) call this%map_object
 
+        call sqlite3_finalize(stmt)
         call sqlite3_close(db)
     end subroutine read_one
 

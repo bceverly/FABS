@@ -5,6 +5,7 @@ BINDIR = ./bin
 CGIDIR = ./cgi
 DBDIR  = ./db
 LIBDIR = ./libs
+LOGDIR = /var/log
 OBJDIR = ./objs
 MODDIR = ./mods
 WEBDIR = /var/www
@@ -20,7 +21,8 @@ OBJFILES = ${OBJDIR}/student_m.o \
 	${OBJDIR}/http_request_m.o ${OBJDIR}/url_helper.o \
 	${OBJDIR}/string_utils.o ${OBJDIR}/json_parser_m.o \
 	${OBJDIR}/object_parser_m.o ${OBJDIR}/xml_parser_m.o \
-	${OBJDIR}/attribute_value_pair_m.o
+	${OBJDIR}/attribute_value_pair_m.o ${OBJDIR}/session_m.o \
+	${OBJDIR}/persistent_object_m.o ${OBJDIR}/log_file_m.o
 
 ${CGIDIR}/api.cgi:	${LIBDIR}/libfsqlite.a ${OBJFILES} api.f90
 	${FORTRAN} -J${MODDIR} -o ${CGIDIR}/api.cgi api.f90 ${OBJFILES} \
@@ -28,6 +30,13 @@ ${CGIDIR}/api.cgi:	${LIBDIR}/libfsqlite.a ${OBJFILES} api.f90
 
 ${OBJDIR}/api_errors.o:	api_errors.f90 ${OBJDIR}/http_response_m.o
 	${FORTRAN} ${FCFLAGS} -o ${OBJDIR}/api_errors.o api_errors.f90
+
+${OBJDIR}/log_file_m.o:	log_file_m.f90
+	${FORTRAN} ${FCFLAGS} -o ${OBJDIR}/log_file_m.o log_file_m.f90
+
+${OBJDIR}/session_m.o:	${OBJDIR}/http_request_m.o ${OBJDIR}/http_response_m.o \
+			session_m.f90
+	${FORTRAN} ${FCFLAGS} -o ${OBJDIR}/session_m.o session_m.f90
 
 ${OBJDIR}/string_utils.o:	string_utils.f90
 	${FORTRAN} ${FCFLAGS} -o ${OBJDIR}/string_utils.o string_utils.f90
@@ -49,7 +58,11 @@ ${OBJDIR}/persistent_collection_m.o:	persistent_collection_m.f90
 	$(FORTRAN) $(FCFLAGS) -o ${OBJDIR}/persistent_collection_m.o \
 			persistent_collection_m.f90
 
-${OBJDIR}/student_m.o:	student_m.f90
+${OBJDIR}/persistent_object_m.o:	persistent_object_m.f90
+	${FORTRAN} ${FCFLAGS} -o ${OBJDIR}/persistent_object_m.o \
+			persistent_object_m.f90
+
+${OBJDIR}/student_m.o:	${OBJDIR}/persistent_object_m.o student_m.f90
 	${FORTRAN} ${FCFLAGS} -o ${OBJDIR}/student_m.o student_m.f90
 
 ${OBJDIR}/http_request_m.o:	${OBJDIR}/url_helper.o \
@@ -103,7 +116,12 @@ ${OBJDIR}/csqlite.o:	csqlite.c
 ${OBJDIR}/fsqlite.o:	fsqlite.f90
 	${FORTRAN} ${FCFLAGS} -o ${OBJDIR}/fsqlite.o fsqlite.f90
 
-.PHONY: clean deploy
+${LOGDIR}/fabs.log:
+	doas touch ${LOGDIR}/fabs.log
+	doas chown www ${LOGDIR}/fabs.log
+	doas chmod 644 ${LOGDIR}/fabs.log
+
+.PHONY: clean deploy schema
 
 clean:
 	rm ${OBJDIR}/*.o ${MODDIR}/*.mod ${LIBDIR}/libfsqlite.a cgi/api.cgi
@@ -113,7 +131,7 @@ schema:
 	- mv ${DBDIR}/students.db ${DBDIR}/students.db.bak 
 	sqlite3 -init ${DBDIR}/schema.sql ${DBDIR}/students.db ""
 
-deploy:	${CGIDIR}/api.cgi
+deploy:	${LOGDIR}/fabs.log ${CGIDIR}/api.cgi
 	doas /bin/sh ${BINDIR}/deploy.sh
 
 debug: ${CGIDIR}/api.cgi

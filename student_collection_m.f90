@@ -8,7 +8,7 @@ module student_collection_m
 
     type, public, extends(persistent_collection_t) :: student_collection_t
         private
-            type(student_t), dimension(:), pointer :: students_m
+            type(student_t), dimension(:), pointer, public :: students_m
 
         contains
             procedure, public, pass(this) :: read_students, &
@@ -23,7 +23,7 @@ contains
     subroutine read_students(this)
         class(student_collection_t), intent(inout) :: this
 
-        call this%set_db_name('students.db')
+        call this%set_db_name('db/students.db')
         call this%set_table_name('student')
         call this%set_object_name('student')
         call this%add_db_char_column('first_name')
@@ -36,7 +36,7 @@ contains
         class(student_collection_t), intent(inout) :: this
         integer, intent(in) :: id
 
-        call this%set_db_name('students.db')
+        call this%set_db_name('db/students.db')
         call this%set_table_name('student')
         call this%set_object_name('student')
         call this%add_db_char_column('first_name')
