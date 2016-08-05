@@ -71,7 +71,7 @@ contains
         write (query, '(a,i5,a)') 'delete from student where id=', &
             this%id_m, ';'
 
-        call this%set_db_name('db/students.db')
+        call this%set_db_name('../cgi-data/students.db')
         call this%open_database()
         call sqlite3_do(this%db_m, query)
         call this%close_database()

@@ -3,7 +3,7 @@ FCFLAGS = -ggdb -c -J${MODDIR}
 
 BINDIR = ./bin
 CGIDIR = ./cgi
-DBDIR  = ./db
+DBDIR  = ${WEBDIR}/cgi-data
 LIBDIR = ./libs
 LOGDIR = /var/log
 OBJDIR = ./objs
@@ -121,6 +121,11 @@ ${LOGDIR}/fabs.log:
 	doas chown www ${LOGDIR}/fabs.log
 	doas chmod 644 ${LOGDIR}/fabs.log
 
+${DBDIR}:
+	doas mkdir ${DBDIR}
+	doas chown www ${DBDIR}
+	doas chmod 755 ${DBDIR}
+
 .PHONY: clean deploy schema
 
 clean:
@@ -131,7 +136,7 @@ schema:
 	- mv ${DBDIR}/students.db ${DBDIR}/students.db.bak 
 	sqlite3 -init ${DBDIR}/schema.sql ${DBDIR}/students.db ""
 
-deploy:	${LOGDIR}/fabs.log ${CGIDIR}/api.cgi
+deploy:	${DBDIR} ${LOGDIR}/fabs.log ${CGIDIR}/api.cgi
 	doas /bin/sh ${BINDIR}/deploy.sh
 
 debug: ${CGIDIR}/api.cgi

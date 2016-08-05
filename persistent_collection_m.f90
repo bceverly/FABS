@@ -1,4 +1,5 @@
 module persistent_collection_m
+    use log_file_m
     use sqlite
 
     implicit none

@@ -7,13 +7,13 @@ fi
 
 SITEDIR=/var/www/htdocs
 CGIDIR=/var/www/cgi-bin
+DBDIR=/var/www/cgi-data
 
 rm -rf ${SITEDIR}/*
 rm -rf ${CGIDIR}/*
+rm -rf ${DBDIR}/*
 
 cp -r site/* ${SITEDIR}
 cp -r cgi/*.cgi ${CGIDIR}
-mkdir ${CGIDIR}/db
-chown www ${CGIDIR}/db
-cp db/students.db ${CGIDIR}/db
-chown www ${CGIDIR}/db/students.db
+cp db/students.db ${DBDIR}
+chown www ${DBDIR}/students.db
