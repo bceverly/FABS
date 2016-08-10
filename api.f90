@@ -108,12 +108,52 @@ program api
                             // trim(request%get_request_body()) // ')')
                     else
                         ! Successful parse
-                        call response%set_response_status(INTERNAL_SERVER_ERROR)
-                        write (msg, '(a,i5)'), 'Total attributes:', &
-                            size(parser%attribute_value_pairs_m)
-                        call response%write_error(msg)
-                        do i=1,size(parser%attribute_value_pairs_m)
-                        end do
+                        if (len_trim(request%get_query_string()) == 0) then
+                            call response%set_response_status(RESPONSE_NOT_FOUND)
+                            call response%write_error('ID required')
+                        else
+                            if (qs_variables(1)%the_attribute /= 'id') then
+                                call response%set_response_status( &
+                                    RESPONSE_NOT_FOUND)
+                                call response%write_error( &
+                                    'Invalid object id name - ' &
+                                    // qs_variables(1)%the_attribute)
+                            else
+                                call str2int(qs_variables(1)%the_value, id, &
+                                    status_val)
+                                if (status_val /= 0) then
+                                    call response%set_response_status( &
+                                        RESPONSE_NOT_FOUND)
+                                    call response%write_error( &
+                                        'Invalid object id - ' &
+                                        // qs_variables(1)%the_value)
+                                else
+                                    do i=1,size(parser%attribute_value_pairs_m)
+                                        select case (parser%attribute_value_pairs_m(i)%the_attribute)
+                                            case ('first_name')
+                                                call student%set_first_name(parser%attribute_value_pairs_m(i)%the_value)
+                                            case ('last_name')
+                                                call student%set_last_name(parser%attribute_value_pairs_m(i)%the_value)
+                                        end select
+                                    end do
+                                    call student%set_id(id)
+
+                                    call student%update_existing()
+                                    call students%read_student(id)
+                                    if (students%get_collection_size() == 1) then
+                                        call response%set_response_status( &
+                                            RESPONSE_OK)
+                                        call response%write_success(students)
+                                    else
+                                        call response%set_response_status( &
+                                            RESPONSE_NOT_FOUND)
+                                        call response%write_error('Object id ' &
+                                            // trim(qs_variables(1)%the_value) &
+                                            // ' not found')
+                                    end if
+                                end if
+                            end if
+                        end if
                     end if
                 case ('DELETE')
                     if (len_trim(request%get_query_string()) == 0) then

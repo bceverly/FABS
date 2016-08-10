@@ -16,7 +16,11 @@ module student_m
         procedure, public, pass(this) :: write_json, &
                                          write_xml, &
                                          load_data, &
-                                         delete_existing
+                                         set_first_name, &
+                                         set_last_name, &
+                                         set_id, &
+                                         delete_existing, &
+                                         update_existing
     end type student_t
 
 contains
@@ -30,6 +34,27 @@ contains
         this%last_name_m = last
         this%id_m = id
     end subroutine load_data
+
+    subroutine set_first_name(this, first)
+        class(student_t), intent(inout) :: this
+        character(len=*), intent(in) :: first
+
+        this%first_name_m = first
+    end subroutine set_first_name
+
+    subroutine set_last_name(this, last)
+        class(student_t), intent(inout) :: this
+        character(len=*), intent(in) :: last
+
+        this%last_name_m = last
+    end subroutine set_last_name
+
+    subroutine set_id(this, id)
+        class(student_t), intent(inout) :: this
+        integer, intent(in) :: id
+
+        this%id_m = id
+    end subroutine set_id
 
     subroutine write_json(this, indent_level)
         class(student_t), intent(in) :: this
@@ -76,5 +101,25 @@ contains
         call sqlite3_do(this%db_m, query)
         call this%close_database()
     end subroutine delete_existing
+
+    subroutine update_existing(this)
+        class(student_t), intent(inout) :: this
+
+        character(len=4096) :: query
+
+        write (query, '(a,a,a,a,a,i5)') "update student set first_name='", &
+            trim(this%first_name_m), &
+            "', last_name='", &
+            trim(this%last_name_m), &
+            "' where id=", &
+            this%id_m
+
+        call log_append('/var/log/fabs.log', query)
+
+        call this%set_db_name('../cgi-data/students.db')
+        call this%open_database()
+        call sqlite3_do(this%db_m, query)
+        call this%close_database()
+    end subroutine update_existing
 
 end module student_m
