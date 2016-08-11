@@ -1,3 +1,5 @@
+![](site/images/FABS-logo.png?raw=true)
+
 Fortran + Apache + BSD + sqlite = Web framework
 
 This is a web framework that leverages Fortran for the middle-tier.  The client
