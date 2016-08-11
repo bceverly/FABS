@@ -123,10 +123,11 @@ contains
         call this%close_database()
     end subroutine update_existing
 
-    subroutine create_new(this)
+    integer function create_new(this)
         class(student_t), intent(inout) :: this
 
         character(len=4096) :: query
+        integer :: rc
 
         write (query, '(a,a,a,a,a,a)') "insert into student(first_name, last_name) ", &
             "values('", &
@@ -140,7 +141,12 @@ contains
         call this%set_db_name('../cgi-data/students.db')
         call this%open_database()
         call sqlite3_do(this%db_m, query)
+
+        ! retrieve the id
+        rc = sqlite3_last_insert_rowid(this%db_m)
+        create_new = rc
+
         call this%close_database()
-    end subroutine create_new
+    end function create_new
 
 end module student_m

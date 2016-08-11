@@ -39,9 +39,9 @@ contains
         call sqlite3_close(this%db_m)
     end subroutine close_database
 
-    subroutine create_new(this)
+    integer function create_new(this)
         class(persistent_object_t), intent(inout) :: this
-    end subroutine create_new
+    end function create_new
 
     subroutine update_existing(this)
         class(persistent_object_t), intent(inout) :: this

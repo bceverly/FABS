@@ -132,9 +132,7 @@ clean:
 	rm ${OBJDIR}/*.o ${MODDIR}/*.mod ${LIBDIR}/libfsqlite.a cgi/api.cgi
 
 schema:
-	- rm ${DBDIR}/students.db.bak 
-	- mv ${DBDIR}/students.db ${DBDIR}/students.db.bak 
-	sqlite3 -init ${DBDIR}/schema.sql ${DBDIR}/students.db ""
+	/bin/sh ${BINDIR}/schema.sh
 
 deploy:	${DBDIR} ${LOGDIR}/fabs.log ${CGIDIR}/api.cgi
 	doas /bin/sh ${BINDIR}/deploy.sh

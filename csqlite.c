@@ -9,6 +9,7 @@
 #define INBETWEEN
 #define sqlite3_open_c_                SQLITE3_OPEN_C
 #define sqlite3_close_c_               SQLITE3_CLOSE_C
+#define sqlite3_last_insert_rowid_c_   SQLITE3_LAST_INSERT_ROWID_C
 #define sqlite3_do_c_                  SQLITE3_DO_C
 #define sqlite3_finalize_c_            SQLITE3_FINALIZE_C
 #define sqlite3_reset_c_               SQLITE3_RESET_C
@@ -35,6 +36,7 @@
 #if defined(DBL_UNDERSCORE)
 #define sqlite3_open_c_                sqlite3_open_c__
 #define sqlite3_close_c_               sqlite3_close_c__
+#define sqlite3_last_insert_rowid_c_   sqlite3_last_insert_rowid_c__
 #define sqlite3_do_c_                  sqlite3_do_c__
 #define sqlite3_finalize_c_            sqlite3_finalize_c__
 #define sqlite3_reset_c_               sqlite3_reset_c__
@@ -104,6 +106,16 @@ int FTNCALL sqlite3_close_c_(
 
    rc = sqlite3_close(*db);
    return rc ;
+}
+
+int FTNCALL sqlite3_last_insert_rowid_c_(
+        sqlite3 **db
+       )
+{
+    int rc;
+
+    rc = sqlite3_last_insert_rowid(*db);
+    return rc;
 }
 
 int FTNCALL sqlite3_do_c_(

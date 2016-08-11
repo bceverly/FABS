@@ -212,7 +212,8 @@ program api
                             end select
                         end do
 
-                        call student%create_new()
+                        id = student%create_new()
+                        call students%read_student(id)
                         call response%set_response_status(RESPONSE_OK)
                         call response%write_success(students)
                     end if

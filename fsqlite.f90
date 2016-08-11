@@ -420,6 +420,26 @@ subroutine sqlite3_close( db )
 
 end subroutine sqlite3_close
 
+! sqlite3_last_insert_rowid --
+!    Return the row Id of the most recent insert
+! Arguments:
+!    db            Structure for the database
+! Side effects:
+!    None
+!
+integer function sqlite3_last_insert_rowid( db )
+   type(SQLITE_DATABASE) :: db
+
+   interface
+      integer function sqlite3_last_insert_rowid_c( handle )
+         integer, dimension(*) :: handle
+      end function sqlite3_last_insert_rowid_c
+   end interface
+
+   sqlite3_last_insert_rowid = sqlite3_last_insert_rowid_c( db%db_handle )
+
+end function sqlite3_last_insert_rowid
+
 
 ! sqlite3_do --
 !    Run a single SQL command
