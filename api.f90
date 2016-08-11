@@ -193,6 +193,29 @@ program api
                         end if
                     end if
                 case ('PUT')
+                    call parser%parse(request%get_request_body())
+
+                    if (parser%error_m) then
+                        ! We had some sort of parser error
+                        call response%set_response_status(INTERNAL_SERVER_ERROR)
+                        call response%write_error(parser%error_string_m // &
+                            '(Request body - ' &
+                            // trim(request%get_request_body()) // ')')
+                    else
+                        ! Successful parse
+                        do i=1,size(parser%attribute_value_pairs_m)
+                            select case (parser%attribute_value_pairs_m(i)%the_attribute)
+                                case ('first_name')
+                                    call student%set_first_name(parser%attribute_value_pairs_m(i)%the_value)
+                                case ('last_name')
+                                    call student%set_last_name(parser%attribute_value_pairs_m(i)%the_value)
+                            end select
+                        end do
+
+                        call student%create_new()
+                        call response%set_response_status(RESPONSE_OK)
+                        call response%write_success(students)
+                    end if
             end select
         case default
             call response%set_response_status(RESPONSE_NOT_FOUND)

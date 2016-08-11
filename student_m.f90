@@ -19,6 +19,7 @@ module student_m
                                          set_first_name, &
                                          set_last_name, &
                                          set_id, &
+                                         create_new, &
                                          delete_existing, &
                                          update_existing
     end type student_t
@@ -121,5 +122,25 @@ contains
         call sqlite3_do(this%db_m, query)
         call this%close_database()
     end subroutine update_existing
+
+    subroutine create_new(this)
+        class(student_t), intent(inout) :: this
+
+        character(len=4096) :: query
+
+        write (query, '(a,a,a,a,a,a)') "insert into student(first_name, last_name) ", &
+            "values('", &
+            trim(this%first_name_m), &
+            "','", &
+            trim(this%last_name_m), &
+            "');"
+
+        call log_append('/var/log/fabs.log', query)
+
+        call this%set_db_name('../cgi-data/students.db')
+        call this%open_database()
+        call sqlite3_do(this%db_m, query)
+        call this%close_database()
+    end subroutine create_new
 
 end module student_m

@@ -8,7 +8,7 @@ module student_collection_m
 
     type, public, extends(persistent_collection_t) :: student_collection_t
         private
-            type(student_t), dimension(:), pointer, public :: students_m
+            type(student_t), dimension(:), pointer, public :: students_m => null()
 
         contains
             procedure, public, pass(this) :: read_students, &
@@ -50,9 +50,11 @@ contains
 
         integer :: i
 
-        do i=1, size(this%students_m)
-            call this%students_m(i)%write_json(1)
-        enddo
+        if (associated(this%students_m) .and. size(this%students_m) > 0) then
+            do i=1, size(this%students_m)
+                call this%students_m(i)%write_json(1)
+            enddo
+        end if
     end subroutine write_json
 
     subroutine write_xml(this)
