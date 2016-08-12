@@ -3,10 +3,10 @@
      
 int main()
 {
-    char buf[70];
+    char buf[150];
     int i;
     read( 0, buf, sizeof( buf ) );  // read 10 chars from standard input
-    for(i=0 ; i<70 ; i++)
+    for(i=0 ; i<150 ; i++)
     {
         putchar(buf[i]);
     }
