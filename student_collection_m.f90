@@ -11,39 +11,52 @@ module student_collection_m
             type(student_t), dimension(:), pointer, public :: students_m => null()
 
         contains
-            procedure, public, pass(this) :: read_students, &
-                                             read_student, &
-                                             write_json, &
+            procedure, public, pass(this) :: write_json, &
                                              write_xml, &
                                              map_object, &
                                              get_collection_size
     end type student_collection_t
 
+    ! Class constructor
+    interface student_collection_t
+        procedure constructor
+    end interface student_collection_t
+
 contains
-    subroutine read_students(this)
-        class(student_collection_t), intent(inout) :: this
+    ! Constructor
+    type(student_collection_t) function constructor()
+        call constructor%set_db_name('../cgi-data/students.db')
+        call constructor%set_table_name('student')
+        call constructor%set_object_name('student')
+        call constructor%add_db_char_column('first_name')
+        call constructor%add_db_char_column('last_name')
+        call constructor%add_db_int_column('id')
+    end function constructor
 
-        call this%set_db_name('../cgi-data/students.db')
-        call this%set_table_name('student')
-        call this%set_object_name('student')
-        call this%add_db_char_column('first_name')
-        call this%add_db_char_column('last_name')
-        call this%add_db_int_column('id')
-        call this%read_all()
-    end subroutine read_students
+!    subroutine read_students(this)
+!        class(student_collection_t), intent(inout) :: this
+!
+!        call this%set_db_name('../cgi-data/students.db')
+!        call this%set_table_name('student')
+!        call this%set_object_name('student')
+!        call this%add_db_char_column('first_name')
+!        call this%add_db_char_column('last_name')
+!        call this%add_db_int_column('id')
+!        call this%read_all()
+!    end subroutine read_students
 
-    subroutine read_student(this, id)
-        class(student_collection_t), intent(inout) :: this
-        integer, intent(in) :: id
-
-        call this%set_db_name('../cgi-data/students.db')
-        call this%set_table_name('student')
-        call this%set_object_name('student')
-        call this%add_db_char_column('first_name')
-        call this%add_db_char_column('last_name')
-        call this%add_db_int_column('id')
-        call this%read_one(id)
-    end subroutine read_student
+!    subroutine read_student(this, id)
+!        class(student_collection_t), intent(inout) :: this
+!        integer, intent(in) :: id
+!
+!        call this%set_db_name('../cgi-data/students.db')
+!        call this%set_table_name('student')
+!        call this%set_object_name('student')
+!        call this%add_db_char_column('first_name')
+!        call this%add_db_char_column('last_name')
+!        call this%add_db_int_column('id')
+!        call this%read_one(id)
+!    end subroutine read_student
 
     subroutine write_json(this)
         class(student_collection_t), intent(inout) :: this

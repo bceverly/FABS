@@ -1,4 +1,5 @@
 module student_m
+    use attribute_value_pair_m
     use log_file_m
     use persistent_object_m
     use sqlite
@@ -9,13 +10,13 @@ module student_m
     type, extends(persistent_object_t), public :: student_t
         private
 
-        character(len=80) :: first_name_m = ''
+        character(len=80),public :: first_name_m = ''
         character(len=80) :: last_name_m = ''
-        integer :: id_m
     contains
         procedure, public, pass(this) :: write_json, &
                                          write_xml, &
                                          load_data, &
+                                         map_from_data, &
                                          set_first_name, &
                                          set_last_name, &
                                          set_id, &
@@ -35,6 +36,26 @@ contains
         this%last_name_m = last
         this%id_m = id
     end subroutine load_data
+
+    subroutine map_from_data(this, the_data)
+        class(student_t), intent(inout) :: this
+        class(attribute_value_pair_t), dimension(:), intent(in) :: the_data
+
+        integer :: i
+        character(len=4096) :: first_name, last_name
+
+        do i=1,size(the_data)
+            select case(trim(the_data(i)%the_attribute))
+                case ('first_name')
+                    first_name = trim(the_data(i)%the_value)
+                case ('last_name')
+                    last_name = trim(the_data(i)%the_value)
+            end select
+        end do
+
+        this%first_name_m = first_name
+        this%last_name_m = last_name
+    end subroutine map_from_data
 
     subroutine set_first_name(this, first)
         class(student_t), intent(inout) :: this
@@ -144,6 +165,7 @@ contains
 
         ! retrieve the id
         rc = sqlite3_last_insert_rowid(this%db_m)
+        this%id_m = rc
         create_new = rc
 
         call this%close_database()

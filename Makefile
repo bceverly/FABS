@@ -22,11 +22,15 @@ OBJFILES = ${OBJDIR}/student_m.o \
 	${OBJDIR}/string_utils.o ${OBJDIR}/json_parser_m.o \
 	${OBJDIR}/object_parser_m.o ${OBJDIR}/xml_parser_m.o \
 	${OBJDIR}/attribute_value_pair_m.o ${OBJDIR}/session_m.o \
-	${OBJDIR}/persistent_object_m.o ${OBJDIR}/log_file_m.o
+	${OBJDIR}/persistent_object_m.o ${OBJDIR}/log_file_m.o \
+	${OBJDIR}/api_m.o
 
 ${CGIDIR}/api.cgi:	${LIBDIR}/libfsqlite.a ${OBJFILES} api.f90
 	${FORTRAN} -J${MODDIR} -o ${CGIDIR}/api.cgi api.f90 ${OBJFILES} \
 	    -L/usr/lib -lsqlite3 -L${LIBDIR} -lfsqlite
+
+${OBJDIR}/api_m.o:	api_m.f90
+	${FORTRAN} ${FCFLAGS} -o ${OBJDIR}/api_m.o api_m.f90
 
 ${OBJDIR}/api_errors.o:	api_errors.f90 ${OBJDIR}/http_response_m.o
 	${FORTRAN} ${FCFLAGS} -o ${OBJDIR}/api_errors.o api_errors.f90
@@ -58,11 +62,13 @@ ${OBJDIR}/persistent_collection_m.o:	persistent_collection_m.f90
 	$(FORTRAN) $(FCFLAGS) -o ${OBJDIR}/persistent_collection_m.o \
 			persistent_collection_m.f90
 
-${OBJDIR}/persistent_object_m.o:	persistent_object_m.f90
+${OBJDIR}/persistent_object_m.o:	${OBJDIR}/attribute_value_pair_m.o \
+			persistent_object_m.f90
 	${FORTRAN} ${FCFLAGS} -o ${OBJDIR}/persistent_object_m.o \
 			persistent_object_m.f90
 
-${OBJDIR}/student_m.o:	${OBJDIR}/persistent_object_m.o student_m.f90
+${OBJDIR}/student_m.o:	${OBJDIR}/log_file_m.o ${OBJDIR}/persistent_object_m.o \
+			student_m.f90
 	${FORTRAN} ${FCFLAGS} -o ${OBJDIR}/student_m.o student_m.f90
 
 ${OBJDIR}/http_request_m.o:	${OBJDIR}/url_helper.o \
