@@ -106,7 +106,7 @@ contains
             this%first_name_m, '</first_name>'
         print '(a,a,a,a)', indent_string, '    <last_name>', &
             this%last_name_m, '</last_name>'
-        print '(a,a,a,a)', indent_string, '    <id>', this%id_m, '</id>'
+        print '(a,a,i5,a)', indent_string, '    <id>', this%id_m, '</id>'
         print '(a,a)', indent_string, '</student>'
     end subroutine write_xml
 

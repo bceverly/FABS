@@ -27,7 +27,7 @@ contains
         print '(a)', '<?xml version="1.0" encoding="UTF-8"?>'
         print '(a)', '<response>'
         print '(a)', '<status>Success</status>'
-        print '(a,i9,a)', '<count>', the_data%get_row_count(), '</count>'
+        print '(a,i9,a)', '<count>', the_data%get_collection_size(), '</count>'
         print '(a,a,a)', '<type>', trim(the_data%get_object_name()), '</type>'
         print '(a)', '<results>'
 
