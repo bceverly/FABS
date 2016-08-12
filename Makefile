@@ -25,8 +25,8 @@ OBJFILES = ${OBJDIR}/student_m.o \
 	${OBJDIR}/persistent_object_m.o ${OBJDIR}/log_file_m.o \
 	${OBJDIR}/api_m.o
 
-${CGIDIR}/api.cgi:	${LIBDIR}/libfsqlite.a ${OBJFILES} api.f90
-	${FORTRAN} -J${MODDIR} -o ${CGIDIR}/api.cgi api.f90 ${OBJFILES} \
+${CGIDIR}/api.cgi:	${LIBDIR}/libfsqlite.a ${OBJFILES} main.f90
+	${FORTRAN} -J${MODDIR} -o ${CGIDIR}/api.cgi main.f90 ${OBJFILES} \
 	    -L/usr/lib -lsqlite3 -L${LIBDIR} -lfsqlite
 
 ${OBJDIR}/api_m.o:	api_m.f90

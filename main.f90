@@ -1,4 +1,4 @@
-program api
+program main
     use api_m
     use student_collection_m
     use student_json_m
@@ -64,4 +64,4 @@ program api
             call response%write_error('Invalid API object - ' &
                 // path_elements(2))
     end select
-end program api
+end program main
